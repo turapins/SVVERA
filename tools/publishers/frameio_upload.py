@@ -3,12 +3,18 @@
 Frame.io is now owned by Adobe. API V4 uses Adobe IMS OAuth2.
 
 Auth options (in priority order):
-  1. FRAMEIO_TOKEN — legacy V2 Bearer token (still works, deprecated)
-  2. FRAMEIO_CLIENT_ID + FRAMEIO_CLIENT_SECRET — Adobe OAuth2 Server-to-Server
-     (get from developer.adobe.com/console → Create project → Add Frame.io API)
+  1. FRAMEIO_TOKEN — legacy V2 Bearer token (still works until Dec 2026)
+  2. FRAMEIO_ACCESS_TOKEN — pre-obtained V4 OAuth token (from scripts/frameio_auth.py)
+     + FRAMEIO_REFRESH_TOKEN — auto-refreshed when access_token expires
+  3. FRAMEIO_CLIENT_ID + FRAMEIO_CLIENT_SECRET — Adobe OAuth2 Server-to-Server
+     (requires enterprise Adobe org with Frame.io entitlement)
 
-V4 upload flow (when using OAuth2):
-  POST /oauth/token → get access_token
+To get option 2 credentials (recommended for most users):
+  1. Create project at developer.adobe.com/console → Add Frame.io API → OAuth Web App
+  2. Run: python3 scripts/frameio_auth.py
+  3. Tokens are saved automatically to .env
+
+V4 upload flow:
   GET  /projects/{project_id} → get root_asset_id
   POST /assets/{parent_id}/children → create asset record
   PUT  upload_urls → upload file bytes to S3
@@ -16,7 +22,6 @@ V4 upload flow (when using OAuth2):
 
 from __future__ import annotations
 
-import base64
 import os
 import time
 from pathlib import Path
@@ -50,16 +55,13 @@ class FrameioUpload(BaseTool):
     capability = "publish"
     provider = "frameio"
 
-    # At least one auth method must be configured:
-    # Option A — legacy V2 token (deprecated but still works):  FRAMEIO_TOKEN
-    # Option B — Adobe OAuth2 (V4 API, recommended):  FRAMEIO_CLIENT_ID + FRAMEIO_CLIENT_SECRET
+    # At least one auth method must be configured (see module docstring)
     dependencies = ["env:FRAMEIO_PROJECT_ID"]
     install_instructions = (
         "Set FRAMEIO_PROJECT_ID plus one of:\n"
-        "  A) FRAMEIO_TOKEN — legacy token (app.frame.io if still accessible)\n"
-        "  B) FRAMEIO_CLIENT_ID + FRAMEIO_CLIENT_SECRET — Adobe Developer Console:\n"
-        "     developer.adobe.com/console → New Project → Add API → Frame.io\n"
-        "     Choose 'Server-to-Server' credential type."
+        "  A) FRAMEIO_TOKEN — legacy V2 token (works until Dec 2026)\n"
+        "  B) FRAMEIO_ACCESS_TOKEN + FRAMEIO_REFRESH_TOKEN — run scripts/frameio_auth.py\n"
+        "  C) FRAMEIO_CLIENT_ID + FRAMEIO_CLIENT_SECRET — Server-to-Server (enterprise only)"
     )
 
     resource_profile = ResourceProfile(network_required=True, disk_mb=2000)
@@ -77,37 +79,77 @@ class FrameioUpload(BaseTool):
         has_project = bool(os.environ.get("FRAMEIO_PROJECT_ID"))
         has_auth = bool(
             os.environ.get("FRAMEIO_TOKEN")
+            or os.environ.get("FRAMEIO_ACCESS_TOKEN")
             or (os.environ.get("FRAMEIO_CLIENT_ID") and os.environ.get("FRAMEIO_CLIENT_SECRET"))
         )
         return ToolStatus.AVAILABLE if (has_project and has_auth) else ToolStatus.UNAVAILABLE
 
-    def _get_bearer_token(self) -> str:
-        """Return a valid Bearer token — legacy or fresh Adobe OAuth2."""
-        legacy = os.environ.get("FRAMEIO_TOKEN", "")
-        if legacy:
-            return legacy
-
+    def _refresh_access_token(self) -> str:
+        """Exchange refresh_token for a new access_token, persist to .env."""
         client_id = os.environ.get("FRAMEIO_CLIENT_ID", "")
         client_secret = os.environ.get("FRAMEIO_CLIENT_SECRET", "")
-        if not (client_id and client_secret):
-            raise DependencyError(
-                "No Frame.io auth configured. Set FRAMEIO_TOKEN or "
-                "FRAMEIO_CLIENT_ID + FRAMEIO_CLIENT_SECRET."
-            )
-
-        # Adobe Server-to-Server token exchange
+        refresh_token = os.environ.get("FRAMEIO_REFRESH_TOKEN", "")
+        if not (client_id and client_secret and refresh_token):
+            raise DependencyError("Cannot refresh: need FRAMEIO_CLIENT_ID, FRAMEIO_CLIENT_SECRET, FRAMEIO_REFRESH_TOKEN")
         resp = requests.post(
             _ADOBE_TOKEN_URL,
             data={
-                "grant_type": "client_credentials",
+                "grant_type": "refresh_token",
                 "client_id": client_id,
                 "client_secret": client_secret,
-                "scope": "openid,AdobeID,frame_io_api",
+                "refresh_token": refresh_token,
             },
             timeout=15,
         )
         resp.raise_for_status()
-        return resp.json()["access_token"]
+        tokens = resp.json()
+        new_token = tokens["access_token"]
+        # Persist refreshed token to .env
+        env_path = os.path.join(os.path.dirname(__file__), "..", "..", ".env")
+        if os.path.exists(env_path):
+            try:
+                from dotenv import set_key
+                set_key(os.path.abspath(env_path), "FRAMEIO_ACCESS_TOKEN", new_token)
+                if "refresh_token" in tokens:
+                    set_key(os.path.abspath(env_path), "FRAMEIO_REFRESH_TOKEN", tokens["refresh_token"])
+            except ImportError:
+                pass
+        os.environ["FRAMEIO_ACCESS_TOKEN"] = new_token
+        return new_token
+
+    def _get_bearer_token(self) -> str:
+        """Return a valid Bearer token — tries all configured auth methods in order."""
+        # Priority 1: legacy V2 token
+        legacy = os.environ.get("FRAMEIO_TOKEN", "")
+        if legacy:
+            return legacy
+
+        # Priority 2: pre-obtained access token (from scripts/frameio_auth.py)
+        access_token = os.environ.get("FRAMEIO_ACCESS_TOKEN", "")
+        if access_token:
+            return access_token
+
+        # Priority 3: Adobe Server-to-Server (enterprise orgs only)
+        client_id = os.environ.get("FRAMEIO_CLIENT_ID", "")
+        client_secret = os.environ.get("FRAMEIO_CLIENT_SECRET", "")
+        if client_id and client_secret:
+            resp = requests.post(
+                _ADOBE_TOKEN_URL,
+                data={
+                    "grant_type": "client_credentials",
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "scope": "openid,AdobeID,frame_io_api",
+                },
+                timeout=15,
+            )
+            resp.raise_for_status()
+            return resp.json()["access_token"]
+
+        raise DependencyError(
+            "No Frame.io auth configured. Run scripts/frameio_auth.py to set up V4 OAuth, "
+            "or set FRAMEIO_TOKEN for legacy V2 access."
+        )
 
     def _headers(self, token: str) -> dict[str, str]:
         return {
@@ -116,8 +158,8 @@ class FrameioUpload(BaseTool):
         }
 
     def _api_base(self) -> str:
-        # Use V4 when OAuth2 creds are present; fall back to V2 for legacy token
-        if os.environ.get("FRAMEIO_CLIENT_ID"):
+        # V4 when any modern auth is configured; V2 only for bare legacy token
+        if os.environ.get("FRAMEIO_ACCESS_TOKEN") or os.environ.get("FRAMEIO_CLIENT_ID"):
             return _V4_API
         return _V2_API
 
@@ -152,7 +194,15 @@ class FrameioUpload(BaseTool):
         try:
             token = self._get_bearer_token()
             project_id = os.environ["FRAMEIO_PROJECT_ID"]
-            parent_id = folder_id or self._get_root_asset_id(token, project_id)
+            try:
+                parent_id = folder_id or self._get_root_asset_id(token, project_id)
+            except requests.HTTPError as exc:
+                # Token expired — try refresh once
+                if exc.response.status_code == 401 and os.environ.get("FRAMEIO_REFRESH_TOKEN"):
+                    token = self._refresh_access_token()
+                    parent_id = folder_id or self._get_root_asset_id(token, project_id)
+                else:
+                    raise
 
             file_size = local.stat().st_size
             create_payload = {
@@ -198,7 +248,7 @@ class FrameioUpload(BaseTool):
                     "review_link": review_link,
                     "asset_url": f"https://next.frame.io/projects/{project_id}/assets/{asset_id}",
                     "file_size_bytes": file_size,
-                    "api_version": "v4" if os.environ.get("FRAMEIO_CLIENT_ID") else "v2",
+                    "api_version": "v4" if self._api_base() == _V4_API else "v2",
                 },
                 artifacts=[file_path],
                 duration_seconds=time.time() - start,
