@@ -48,6 +48,9 @@ gcp-*.json
 *-service-account.json
 service-account*.json
 service_account*.json
+# Google Drive OAuth credentials and tokens — never commit
+scripts/drive_credentials.json
+scripts/drive_token.json
 
 # Stray media downloads (test/scratch clips left in repo root)
 pexels_video_*.mp4

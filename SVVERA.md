@@ -188,8 +188,8 @@ CLICKUP_LIST_ID=        # Performance Sets board
 | ElevenLabs | ✅ ключ есть |
 | Pexels | ✅ ключ есть |
 | Pixabay | ✅ ключ есть |
-| Higgsfield | 🔑 ключ нужен |
-| Gemini | 🔑 ключ нужен |
+| Higgsfield | ✅ ключ есть |
+| Gemini | ✅ ключ есть (GOOGLE_API_KEY) |
 | HeyGen | ✅ ключ есть |
 | davinci-resolve-mcp | 🔧 нужно установить |
 | Google Drive | 🔧 нужна настройка |
