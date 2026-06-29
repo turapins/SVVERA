@@ -1,0 +1,52 @@
+name: Auto-update agent skills
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-skills:
+    runs-on: ubuntu-latest
+    steps:
+      # Pinned to commit SHA — safer than floating tags
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
+        with:
+          node-version: '20'
+
+      - name: Update vercel-labs/agent-skills
+        run: npx --yes skills add vercel-labs/agent-skills
+
+      - name: Update coreyhaines31/marketingskills
+        run: npx --yes skills add coreyhaines31/marketingskills
+
+      - name: Commit and open PR if changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No skill changes this week."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B auto/update-skills
+          git add .agents/skills/
+          git commit -m "chore: weekly agent skills sync"
+          git push --force origin auto/update-skills
+          gh pr create \
+            --title "Weekly skills update" \
+            --body "Automated weekly update of vercel-labs/agent-skills and coreyhaines31/marketingskills. Review diff — if new skills appeared, update Layer 3 table in AGENT_GUIDE.md." \
+            --base main \
+            --head auto/update-skills \
+            --label automation \
+            || echo "PR already exists, branch updated."
