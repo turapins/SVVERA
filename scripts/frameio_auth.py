@@ -21,7 +21,7 @@ from dotenv import dotenv_values, set_key
 ADOBE_AUTH_URL = "https://ims-na1.adobelogin.com/ims/authorize/v2"
 ADOBE_TOKEN_URL = "https://ims-na1.adobelogin.com/ims/token/v3"
 REDIRECT_URI = "https://localhost:8080/oauth/callback"
-SCOPES = "openid,profile,email,offline_access,AdobeID,frameio.all"
+SCOPES = "openid,profile,email,offline_access,AdobeID"
 
 ENV_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
