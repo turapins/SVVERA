@@ -2,6 +2,12 @@
 
 Multi-model orchestrator with proprietary Soul model for character-consistent,
 photorealistic video generation. Routes to Kling, Veo, Sora, and WAN under the hood.
+
+Fallback path: when the Higgsfield MCP connector is active, prefer
+`tools/video/higgsfield_mcp.py` (calls mcp__higgsfield__generate_video
+directly, no API key needed, broader capability surface). This API-key tool
+exists for headless/unattended runs where no agent is present to place an
+MCP call.
 """
 
 from __future__ import annotations
