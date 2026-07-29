@@ -88,6 +88,18 @@ class ToolRuntime(str, Enum):
     LOCAL_GPU = "local_gpu"    # Runs on-device but needs GPU (VRAM)
     API = "api"                # Calls an external API, requires API key, costs money
     HYBRID = "hybrid"          # Can run locally OR via API (e.g., image_selector)
+    MCP = "mcp"                # Invoked directly by the agent via a connected MCP
+                                # server tool (mcp__<server>__<tool>) rather than a
+                                # Python HTTP/subprocess call. execute() cannot run
+                                # this itself — see the tool's docstring for the
+                                # exact mcp__ tool names to call. Availability
+                                # depends on the connector being active in the
+                                # current session; the registry cannot verify that.
+    BROWSER = "browser"        # Invoked directly by the agent driving a live
+                                # browser session (claude-in-chrome tools), not a
+                                # Python call. Used when the only path to a real
+                                # asset is the provider's logged-in web UI (no API
+                                # exists). execute() cannot run this itself.
 
 
 class ExecutionMode(str, Enum):
