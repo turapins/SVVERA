@@ -23,7 +23,7 @@ Read [`context/scripts/`](context/scripts/) for winning and losing ad scripts wi
 2. **No random generation** — always use reference image control via Higgsfield
 3. **Ivan approves** every stage before moving forward
 4. Narration voices: ElevenLabs (primary) or Higgsfield Voice (alternative)
-5. Simple edits → Remotion + FFmpeg. Complex projects → DaVinci Resolve (davinci-resolve-mcp)
+5. Simple edits → Remotion + FFmpeg. Complex projects → DaVinci Resolve (davinci-resolve-mcp — see "DaVinci Resolve MCP" below for location/update instructions)
 6. Content types: UGC ads, podcasts (2 characters), showmensets, stickers, statics
 7. Campaigns: **Web funnel** (longer, educational) vs **App installs** (short, action-oriented)
 
@@ -38,3 +38,29 @@ Read [`context/scripts/`](context/scripts/) for winning and losing ad scripts wi
 - **Analysis**: Gemini Vision
 - **Avatars**: HeyGen
 - **Competitor research**: Tryatria (pending access)
+
+### DaVinci Resolve MCP
+
+Lives at `.mcp-servers/davinci-resolve-mcp/` — a real git clone of
+[samuelgursky/davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp), not a
+zip drop, so it can be updated with `git pull`. Gitignored (machine-specific
+venv/node_modules and absolute paths) — not part of OpenMontage's own repo
+history.
+
+Two servers are registered in the project-root `.mcp.json` (also gitignored,
+same reason):
+- `davinci-resolve` — the original compound Python server
+- `davinci-resolve-advanced` — newer Node server with the deeper render/AAF/
+  delivery-target tooling from recent releases
+
+**To update to the latest release** (on-demand — do not automate this into a
+cron/background job; same "check when asked" policy as the SVVERA↔calesthio
+upstream sync):
+```bash
+cd .mcp-servers/davinci-resolve-mcp
+python3 install.py --update-now         # safe git fast-forward if a newer release exists
+npm install                              # only if package.json changed
+```
+Update policy is set to `notify` (surfaces that a new version exists, doesn't
+apply it silently). Change with `python3 install.py --update-policy auto|prompt|never`
+if a different behavior is ever wanted.
