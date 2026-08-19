@@ -11,16 +11,15 @@ each project, fixes the Russian script, and generates. Only then do credits get 
 (~5 generative credits per output-minute; ~76 min of source here → roughly 380 credits
 if all 29 are rendered).
 
-## Known cosmetic gap
+## Naming — done
 
-The proofread projects are titled after their Drive URL, not the creative code, because
-a URL import always names them that way. Three were renamed by hand and two of those
-reverted, so treat the rename helper's `ok:` return as unverified — it reports its own
-code path, not a server confirmation. Re-check the title after renaming. Only
-`RW1_KR_TST_56_A_V6` is known to have stuck.
+All 29 are titled `<CREATIVE_CODE>-Russian`, verified after a page reload (0 left with a
+Drive-URL title). The suffix matches the team's `c4-are-you-awake-Russian` form and keeps
+these distinct from the es/fr/it/pl translate folders, which carry the bare code.
 
-If the team needs coded titles, rename them from Projects (hover tile → `…` → Rename),
-2–3 per JS call to stay under the 45 s CDP timeout.
+Worth remembering: the first rename pass reported 28 successes that were all false. A
+dispatched `KeyboardEvent('Enter')` updates React locally — the tile shows the new name — but
+never reaches the server. Only real keystrokes commit it, and only a reload proves it.
 
 ## The 29 creatives (Drive IDs, all link-shared)
 

@@ -82,9 +82,23 @@ const scale = <screenshotWidth> / window.innerWidth;   // e.g. 840/2160 = 0.3889
 
 ## Step 3 — rename the project folder
 
-A URL-imported job names the folder **and all its outputs** after the Drive URL, which breaks the universal naming rule (video name = script name = ClickUp task name). Rename the folder to the creative code; outputs keep their own `-Language` suffix, matching the team's existing `KR_TST_61_A_1_CLEAN-Italian-Polish` pattern.
+## Renaming projects — the commit needs a real keypress
 
-Hover the tile to render its `…` button, then Rename. Automate it, but batch only **2–3 renames per JS call** — more exceeds the 45 s CDP timeout. The renames still land even when the call times out, so re-check state before retrying rather than redoing them.
+A URL import titles the project (and, for translate jobs, its outputs) after the Drive URL,
+which breaks the universal naming rule. Rename to the creative code; for a proofread pass
+append the language, matching the team's existing `c4-are-you-awake-Russian` form —
+e.g. `IT_TST_87_B_4-Russian`. That also keeps proofread items distinct from the
+translate folders, which carry the bare code.
+
+Use JS only to *open* the editor — hover the tile to render its `…` button, click `Rename` —
+then type the new name and press **Enter as real keystrokes**. A dispatched
+`KeyboardEvent('Enter')` updates React's local state and the tile visibly shows the new
+title, but **the rename never reaches the server**: reload and the URL name is back. This
+produced 28 false "verified" renames in one run.
+
+**Therefore: never verify a rename against the live DOM.** The optimistic update makes the
+check pass. Verify only after a page reload, asserting both that the new title is present
+*and* that the Drive-ID fragment is gone.
 
 ## Cost
 

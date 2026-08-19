@@ -55,7 +55,10 @@ Steps 1–5 are **exactly** locals-translate — read that skill for the full tr
 6. **Press `Escape`**, then click **`Review and edit script`** — a real coordinate click, to the right of `Advanced Settings` beneath the file card. The Escape matters: the language dropdown stays open over that row and eats the click, leaving you on the same page with no error. This is the whole action; **do not** touch `Translate`.
    - Success = the page navigates to `…/projects` and a new entry appears labelled `<Language> Proofread`, dated `just now`.
 
-Then rename the project folder to the creative code, exactly as in locals_translate — the import still names everything after the Drive URL.
+Then rename the project — see **Renaming projects** in locals_translate. In short: JS opens
+the editor, but the new name and Enter must be **real keystrokes**, and the result is only
+real if it survives a page reload. A dispatched Enter shows the new title and silently
+discards it.
 
 ## Verify
 
