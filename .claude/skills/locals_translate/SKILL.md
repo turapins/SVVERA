@@ -1,6 +1,6 @@
 ---
 name: locals-translate
-description: Localise Vocal Image creatives with HeyGen Video Translate — dub + lip-sync one or many videos into any target languages, always on the Precision engine with source quality/format preserved, driven through the browser UI with Google Drive links. Use when Ivan says "/locals_translate", "переведи эти крео", "translate these creatives to es fr it pl", "залей в heygen и переведи", names languages next to a list of creative codes, or drops a Drive folder / local files and asks for localised versions. For a human-corrected script pass instead of direct generation, use locals-profread.
+description: Localise Vocal Image creatives with HeyGen Video Translate — dub + lip-sync one or many videos into any target languages, always on the Precision engine with source quality/format preserved, driven through the browser UI with Google Drive links. Use when Ivan says "/locals_translate", "переведи эти крео", "translate these creatives to es fr it pl", "залей в heygen и переведи", names languages next to a list of creative codes, or drops a Drive folder / local files and asks for localised versions. For a human-corrected script pass instead of direct generation, use locals_profread.
 ---
 
 # locals-translate
@@ -16,7 +16,7 @@ Also triggers on the underscore spelling Ivan uses: `locals_translate`.
 - A Drive folder link or local file paths + a language list
 - Any request to localise / dub existing creatives (not to *create* new ones)
 
-Use **locals-profread** instead when Ivan wants the script reviewed before generation.
+Use **locals_profread** instead when Ivan wants the script reviewed before generation.
 
 ## Inputs
 

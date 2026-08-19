@@ -1,11 +1,11 @@
 ---
 name: locals-profread
-description: Open a HeyGen "<Language> Proofread" pass on Vocal Image creatives — transcribe and translate the script into the target language and stop there, so a human corrects it before any video is generated. Use when Ivan says "/locals_profread", "сделай профрид на русский", "open proofread for each video", "не генерь перевод, а открой профрид", or names a language and asks for a script-review pass rather than finished dubs. For direct dub + lip-sync generation instead, use locals-translate.
+description: Open a HeyGen "<Language> Proofread" pass on Vocal Image creatives — transcribe and translate the script into the target language and stop there, so a human corrects it before any video is generated. Use when Ivan says "/locals_profread", "сделай профрид на русский", "open proofread for each video", "не генерь перевод, а открой профрид", or names a language and asks for a script-review pass rather than finished dubs. For direct dub + lip-sync generation instead, use locals_translate.
 ---
 
 # locals-profread
 
-Same pipeline as **locals-translate**, but it stops at the script stage: each video becomes a `<Language> Proofread` project that a human opens, corrects, and only then generates. Ivan's standing use for this is **Russian**, where machine translation needs a native pass before it can ship.
+Same pipeline as **locals_translate**, but it stops at the script stage: each video becomes a `<Language> Proofread` project that a human opens, corrects, and only then generates. Ivan's standing use for this is **Russian**, where machine translation needs a native pass before it can ship.
 
 Also triggers on the underscore spelling Ivan uses: `locals_profread`.
 
@@ -18,7 +18,7 @@ Also triggers on the underscore spelling Ivan uses: `locals_profread`.
 
 ## Why it is separate from locals-translate
 
-| | locals-translate | locals-profread |
+| | locals_translate | locals_profread |
 |---|---|---|
 | Final click | `Translate` | **`Review and edit script`** |
 | Result | finished dubbed videos | a `<Language> Proofread` project |
@@ -55,7 +55,7 @@ Steps 1–5 are **exactly** locals-translate — read that skill for the full tr
 6. **Press `Escape`**, then click **`Review and edit script`** — a real coordinate click, to the right of `Advanced Settings` beneath the file card. The Escape matters: the language dropdown stays open over that row and eats the click, leaving you on the same page with no error. This is the whole action; **do not** touch `Translate`.
    - Success = the page navigates to `…/projects` and a new entry appears labelled `<Language> Proofread`, dated `just now`.
 
-Then rename the project folder to the creative code, exactly as in locals-translate — the import still names everything after the Drive URL.
+Then rename the project folder to the creative code, exactly as in locals_translate — the import still names everything after the Drive URL.
 
 ## Verify
 
