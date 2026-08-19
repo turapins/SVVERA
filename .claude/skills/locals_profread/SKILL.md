@@ -1,5 +1,5 @@
 ---
-name: locals-profread
+name: locals_profread
 description: Open a HeyGen "<Language> Proofread" pass on Vocal Image creatives — transcribe and translate the script into the target language and stop there, so a human corrects it before any video is generated. Use when Ivan says "/locals_profread", "сделай профрид на русский", "open proofread for each video", "не генерь перевод, а открой профрид", or names a language and asks for a script-review pass rather than finished dubs. For direct dub + lip-sync generation instead, use locals_translate.
 ---
 
