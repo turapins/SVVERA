@@ -116,3 +116,6 @@ venv/
 
 # Serena MCP local project cache (machine-specific)
 .serena/
+
+# Daily competitor-creative collection (regenerable from Atria API)
+data/competitor_refs/

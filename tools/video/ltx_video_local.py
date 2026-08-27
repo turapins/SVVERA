@@ -43,7 +43,7 @@ class LTXVideoLocal(BaseTool):
         "local_gpu": True,
     }
     best_for = [
-        "local LTX workflows already tuned around LTX prompting",
+        "local LTX-2.3 workflows already tuned around LTX prompting",
         "teams that want one dedicated LTX local path in the registry",
     ]
     not_good_for = ["CPU-only machines"]

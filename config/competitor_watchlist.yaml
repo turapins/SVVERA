@@ -1,0 +1,28 @@
+# Competitor watchlist for the daily Atria / Meta Ad Library collection
+# (scripts/collect_daily_competitor_creatives.py).
+#
+# Edit this file to tune what gets collected — no code changes needed.
+
+queries:
+  - "public speaking app"
+  - "communication coach app"
+  - "confidence coaching app"
+  - "speech coach"
+  - "improve communication skills app"
+  - "social confidence app"
+  - "charisma coach app"
+  - "vocal coaching app"
+
+# Only ads from these brands are kept — Atria's broad-match search otherwise
+# returns a lot of unrelated noise (e.g. searching "speech coach" surfaces
+# badminton academies and restaurant scheduling software).
+relevant_brands:
+  - "The Outgoing Co"
+  - "Skillsta App"
+  - "Bitesy"
+  - "Cheryl Porter Vocal Coach"
+  - "Roger Love"
+
+# Never collect our own brand as a "competitor".
+exclude_brands:
+  - "Vocal Image App"

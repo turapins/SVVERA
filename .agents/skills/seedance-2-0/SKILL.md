@@ -278,8 +278,25 @@ Shot 3 (extreme close-up, rack focus): hero's eyes open, wind whipping.
 - [ ] Grade matches the approved style playbook
 - [ ] Output duration matches what you requested (some endpoints round)
 
+## Rules reference — prompt craft
+
+The sections above cover *what the model can do* and *which gateway to route through*. These rule
+files cover *how to write the prompt*. Read the relevant one before authoring:
+
+- [rules/prompt-modes.md](rules/prompt-modes.md) — the 8 prompt modes with skeletons
+  (Single-Shot, Multi-Shot 15s, Reference-Based, Continuation, Action/Movement,
+  Emotion/Performance, Style/Director-Language, Atmosphere/Environment). **Pick a mode before
+  writing a word.**
+- [rules/testing-protocol.md](rules/testing-protocol.md) — the fast building method, six-pass
+  controlled iteration, anti-patterns, training drills.
+- [rules/seedance-2-5-multireference.md](rules/seedance-2-5-multireference.md) — **Seedance 2.5**:
+  50 reference materials, the five-step reference-mapping workflow, one-character-multiple-views
+  identity fusion, 30-second stage structure, timestamp and pacing control.
+
 ## Sources
 
+- Seedance 2.0 Prompt Skeletons Handbook + Serious Examples Supplement (Higgsfield)
+- Seedance 2.5 — New Capabilities Part 2 (Higgsfield / JellyFortuna)
 - fal.ai Seedance 2.0: https://fal.ai/seedance-2.0
 - fal.ai how-to-use: https://fal.ai/learn/tools/how-to-use-seedance-2-0
 - Replicate bytedance collection: https://replicate.com/bytedance
