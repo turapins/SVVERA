@@ -186,19 +186,24 @@ HUNYUAN_VARIANTS = {
 
 LTX_LOCAL_VARIANTS = {
     "ltx2-local": {
-        "name": "LTX-2 (Local)",
-        "hf_id": "Lightricks/LTX-2",
-        "pipeline_class": "LTXPipeline",
+        "name": "LTX-2.3 (Local)",
+        # Diffusers-converted weights repo; the raw Lightricks/LTX-2.3 checkpoint
+        # uses the separate `ltx_pipelines` package, not diffusers, directly.
+        "hf_id": "diffusers/LTX-2.3-Diffusers",
+        "pipeline_class": "LTX2Pipeline",
+        "pipeline_class_i2v": "LTX2ImageToVideoPipeline",
         "vram_mb": 12000,
         "quality": "high",
         "speed": "medium",
         "t2v": True,
         "i2v": True,
-        "license": "LTX-2-Community",
+        "license": "LTX-2.3 Open Weights (Community — free under $10M ARR, else contact Lightricks)",
         "default_width": 768,
         "default_height": 512,
         "default_num_frames": 121,
-        "fps": 30,
+        # Was 30 previously, which contradicted LTX2_FRAME_COUNTS below (that
+        # table assumes 24fps, e.g. 121 frames -> ~5s, 193 frames -> ~8s).
+        "fps": 24,
     },
 }
 
@@ -243,6 +248,39 @@ LTX2_FRAME_COUNTS = {
     "5s": 121,
     "6.7s": 161,
     "8s": 193,
+}
+
+# MOVA (OpenMOSS) — synchronized video+audio generation. Unlike the diffusers-
+# based variants above, MOVA ships no pip-installable pipeline class; it's run
+# via `torchrun scripts/inference_single.py` against a locally cloned
+# https://github.com/OpenMOSS/MOVA checkout. A reference image is *required*
+# (there is no pure text-to-video mode) — that maps directly onto this
+# project's "always use reference image control" rule.
+MOVA_LOCAL_VARIANTS = {
+    "mova-360p": {
+        "name": "MOVA 360p",
+        "hf_id": "OpenMOSS-Team/MOVA-360p",
+        "vram_mb": 12000,  # layerwise offload, per upstream README
+        "quality": "medium",
+        "speed": "medium",
+        "default_width": 640,
+        "default_height": 352,
+        "default_num_frames": 193,
+        "fps": 24.0,
+        "license": "Apache-2.0",
+    },
+    "mova-720p": {
+        "name": "MOVA 720p",
+        "hf_id": "OpenMOSS-Team/MOVA-720p",
+        "vram_mb": 48000,  # component-wise offload, per upstream README
+        "quality": "high",
+        "speed": "slow",
+        "default_width": 1280,
+        "default_height": 720,
+        "default_num_frames": 193,
+        "fps": 24.0,
+        "license": "Apache-2.0",
+    },
 }
 
 
@@ -309,6 +347,45 @@ def local_install_instructions() -> str:
     )
 
 
+def mova_repo_path() -> Path | None:
+    raw = os.environ.get("MOVA_REPO_PATH")
+    if not raw:
+        return None
+    path = Path(raw)
+    return path if (path / "scripts" / "inference_single.py").is_file() else None
+
+
+def mova_local_generation_status() -> ToolStatus:
+    if not local_generation_enabled():
+        return ToolStatus.UNAVAILABLE
+    if mova_repo_path() is None:
+        return ToolStatus.UNAVAILABLE
+    if not shutil.which("torchrun"):
+        return ToolStatus.UNAVAILABLE
+    try:
+        import torch  # noqa: F401
+    except ImportError:
+        return ToolStatus.UNAVAILABLE
+    return ToolStatus.AVAILABLE
+
+
+def mova_local_install_instructions() -> str:
+    return (
+        "Clone and install OpenMOSS/MOVA, then point at it via env vars:\n"
+        "  git clone https://github.com/OpenMOSS/MOVA.git\n"
+        "  cd MOVA && conda create -n mova python=3.13 -y && conda activate mova\n"
+        "  pip install -e .\n"
+        "  hf download OpenMOSS-Team/MOVA-360p --local-dir ../MOVA-360p\n"
+        "\n"
+        "  export VIDEO_GEN_LOCAL_ENABLED=true\n"
+        "  export MOVA_REPO_PATH=/path/to/MOVA\n"
+        "  export MOVA_CKPT_PATH=/path/to/MOVA-360p\n"
+        "\n"
+        "GPU: 360p needs ~12-48GB VRAM depending on --offload mode (layerwise vs "
+        "component-wise); 720p needs ~48GB+. See upstream README for exact profiles."
+    )
+
+
 def estimate_quality_cost(quality: str) -> float:
     if quality == "highest":
         return 0.50
@@ -334,7 +411,9 @@ def load_diffusers_pipeline(pipeline_class: str, model_id: str, enable_offload: 
     pipeline_map = {
         "WanPipeline": "WanPipeline",
         "HunyuanVideoPipeline": "HunyuanVideoPipeline",
-        "LTXPipeline": "LTXPipeline",
+        "LTXPipeline": "LTXPipeline",  # legacy LTX-Video (v1) pipeline class
+        "LTX2Pipeline": "LTX2Pipeline",  # LTX-2 / LTX-2.3 text-to-video
+        "LTX2ImageToVideoPipeline": "LTX2ImageToVideoPipeline",  # LTX-2 / LTX-2.3 image-to-video
         "CogVideoXPipeline": "CogVideoXPipeline",
     }
     pipeline_name = pipeline_map.get(pipeline_class, pipeline_class)
@@ -430,7 +509,8 @@ def generate_local_video(
     num_frames = inputs.get("num_frames", meta["default_num_frames"])
     fps = meta["fps"]
     model_id = meta.get("hf_i2v_id") if operation == "image_to_video" and meta.get("hf_i2v_id") else meta["hf_id"]
-    pipeline = load_diffusers_pipeline(meta["pipeline_class"], model_id, enable_offload)
+    pipeline_class = meta.get("pipeline_class_i2v") if operation == "image_to_video" and meta.get("pipeline_class_i2v") else meta["pipeline_class"]
+    pipeline = load_diffusers_pipeline(pipeline_class, model_id, enable_offload)
 
     generation_args: dict[str, Any] = {
         "prompt": prompt,
@@ -479,6 +559,208 @@ def generate_local_video(
         artifacts=[str(output_path)],
         seed=seed,
         model=model_id,
+    )
+
+
+def generate_mova_local_video(
+    *,
+    variants: dict[str, dict[str, Any]],
+    default_variant: str,
+    inputs: dict[str, Any],
+) -> ToolResult:
+    """Run OpenMOSS/MOVA via `torchrun scripts/inference_single.py` as a subprocess.
+
+    Unlike generate_local_video (diffusers pipeline call in-process), MOVA has
+    no pip-installable pipeline class — it ships as a standalone repo you run
+    with torchrun. This shells out against a locally cloned checkout.
+    """
+    repo_path = mova_repo_path()
+    if repo_path is None:
+        return ToolResult(
+            success=False,
+            error="MOVA_REPO_PATH is not set or does not point at a valid OpenMOSS/MOVA checkout.",
+        )
+
+    variant = inputs.get("model_variant", default_variant)
+    if variant not in variants:
+        return ToolResult(
+            success=False,
+            error=f"Unknown model_variant: {variant}. Available: {', '.join(sorted(variants))}",
+        )
+    meta = variants[variant]
+
+    prompt = inputs["prompt"]
+    ref_path = inputs.get("reference_image_path")
+    ref_url = inputs.get("reference_image_url")
+    if not ref_path and not ref_url:
+        return ToolResult(
+            success=False,
+            error="MOVA requires a reference image — pass reference_image_path or reference_image_url "
+            "(there is no text-only generation mode).",
+        )
+    if ref_url and not ref_path:
+        import tempfile
+
+        import requests
+
+        resp = requests.get(ref_url, timeout=60)
+        resp.raise_for_status()
+        suffix = Path(ref_url).suffix or ".png"
+        tmp = tempfile.NamedTemporaryFile(suffix=suffix, delete=False)
+        tmp.write(resp.content)
+        tmp.close()
+        ref_path = tmp.name
+
+    ckpt_path = os.environ.get("MOVA_CKPT_PATH")
+    if not ckpt_path:
+        return ToolResult(success=False, error="MOVA_CKPT_PATH is not set (path to the downloaded checkpoint dir).")
+
+    width = inputs.get("width", meta["default_width"])
+    height = inputs.get("height", meta["default_height"])
+    num_frames = inputs.get("num_frames", meta["default_num_frames"])
+    fps = inputs.get("fps", meta["fps"])
+    seed = inputs.get("seed", 42)
+    num_inference_steps = inputs.get("num_inference_steps", 50)
+    output_path = Path(inputs.get("output_path", "mova_video_local.mp4"))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        "torchrun",
+        "--nproc_per_node=1",
+        "scripts/inference_single.py",
+        "--ckpt_path", ckpt_path,
+        "--prompt", prompt,
+        "--ref_path", ref_path,
+        "--output_path", str(output_path.resolve()),
+        "--height", str(height),
+        "--width", str(width),
+        "--num_frames", str(num_frames),
+        "--fps", str(fps),
+        "--seed", str(seed),
+        "--num_inference_steps", str(num_inference_steps),
+        "--offload", inputs.get("offload", "group"),
+    ]
+    if inputs.get("negative_prompt"):
+        cmd += ["--negative_prompt", inputs["negative_prompt"]]
+
+    proc = subprocess.run(cmd, cwd=str(repo_path), capture_output=True, text=True, timeout=1800, check=False)
+    if proc.returncode != 0:
+        return ToolResult(
+            success=False,
+            error=f"MOVA inference failed (exit {proc.returncode}): {proc.stderr[-2000:]}",
+        )
+    if not output_path.exists():
+        return ToolResult(success=False, error=f"MOVA reported success but no output file at {output_path}")
+
+    return ToolResult(
+        success=True,
+        data={
+            "provider": "mova",
+            "model_variant": variant,
+            "provider_name": meta["name"],
+            "mode": "local",
+            "prompt": prompt,
+            "model_id": meta["hf_id"],
+            "width": width,
+            "height": height,
+            "num_frames": num_frames,
+            "fps": fps,
+            "duration_seconds": round(num_frames / fps, 2),
+            "operation": "image_to_video",
+            "output": str(output_path),
+            "format": "mp4",
+            "license": meta["license"],
+            "native_audio": True,
+            "lip_sync": True,
+            **probe_output(output_path),
+        },
+        artifacts=[str(output_path)],
+        seed=seed,
+        model=meta["hf_id"],
+    )
+
+
+def generate_mova_modal_video(inputs: dict[str, Any]) -> ToolResult:
+    import base64
+
+    import requests
+
+    endpoint_url = os.environ.get("MODAL_MOVA_ENDPOINT_URL")
+    if not endpoint_url:
+        return ToolResult(success=False, error="MODAL_MOVA_ENDPOINT_URL not set.")
+
+    prompt = inputs["prompt"]
+    ref_path = inputs.get("reference_image_path")
+    ref_url = inputs.get("reference_image_url")
+    if not ref_path and not ref_url:
+        return ToolResult(
+            success=False,
+            error="MOVA requires a reference image — pass reference_image_path or reference_image_url "
+            "(there is no text-only generation mode).",
+        )
+
+    variant = inputs.get("model_variant", "mova-360p")
+    width = inputs.get("width", 640 if variant == "mova-360p" else 1280)
+    height = inputs.get("height", 352 if variant == "mova-360p" else 720)
+    num_frames = inputs.get("num_frames", 193)
+    fps = inputs.get("fps", 24.0)
+
+    payload: dict[str, Any] = {
+        "prompt": prompt,
+        "model_variant": variant,
+        "width": width,
+        "height": height,
+        "num_frames": num_frames,
+        "fps": fps,
+        "seed": inputs.get("seed", 42),
+        "num_inference_steps": inputs.get("num_inference_steps", 50),
+    }
+    if inputs.get("negative_prompt"):
+        payload["negative_prompt"] = inputs["negative_prompt"]
+    if ref_path:
+        payload["ref_image"] = base64.b64encode(Path(ref_path).read_bytes()).decode()
+    else:
+        payload["ref_image_url"] = ref_url
+
+    response = requests.post(endpoint_url, json=payload, timeout=600)
+    response.raise_for_status()
+    output_path = Path(inputs.get("output_path", "mova_video_modal.mp4"))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    content_type = response.headers.get("content-type", "")
+    if "video" in content_type or "octet-stream" in content_type:
+        output_path.write_bytes(response.content)
+    else:
+        response_payload = response.json()
+        video_url = response_payload.get("video_url") or response_payload.get("url")
+        if not video_url:
+            return ToolResult(success=False, error=f"No video data in response: {response_payload}")
+        download = requests.get(video_url, timeout=120)
+        download.raise_for_status()
+        output_path.write_bytes(download.content)
+
+    return ToolResult(
+        success=True,
+        data={
+            "provider": "mova-modal",
+            "provider_name": "MOVA (Modal)",
+            "mode": "modal",
+            "prompt": prompt,
+            "model_variant": variant,
+            "width": width,
+            "height": height,
+            "num_frames": num_frames,
+            "fps": fps,
+            "duration_seconds": round(num_frames / fps, 2),
+            "operation": "image_to_video",
+            "output": str(output_path),
+            "format": "mp4",
+            "native_audio": True,
+            "lip_sync": True,
+        },
+        artifacts=[str(output_path)],
+        seed=inputs.get("seed", 42),
+        model="mova",
     )
 
 
@@ -737,7 +1019,7 @@ def generate_ltx_modal_video(inputs: dict[str, Any]) -> ToolResult:
         success=True,
         data={
             "provider": "ltx-modal",
-            "provider_name": "LTX-2 (Modal)",
+            "provider_name": "LTX-2.3 (Modal)",
             "mode": "modal",
             "prompt": prompt,
             "width": width,
@@ -751,7 +1033,7 @@ def generate_ltx_modal_video(inputs: dict[str, Any]) -> ToolResult:
         },
         artifacts=[str(output_path)],
         seed=inputs.get("seed"),
-        model="ltx-2",
+        model="ltx-2.3",
     )
 
 

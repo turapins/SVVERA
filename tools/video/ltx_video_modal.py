@@ -46,12 +46,12 @@ class LTXVideoModal(BaseTool):
         "native_audio": False,
         "self_hosted_cloud": True,
     }
-    best_for = ["self-hosted cloud GPU rendering for LTX without local workstation dependence"]
+    best_for = ["self-hosted cloud GPU rendering for LTX-2.3 without local workstation dependence"]
     not_good_for = ["zero-setup local workflows"]
     provider_matrix = {
         "ltx2-modal": {
             "tool": "ltx_video_modal",
-            "name": "LTX-2 (Modal)",
+            "name": "LTX-2.3 (Modal)",
             "mode": "api",
             "quality": "high",
             "speed": "medium",

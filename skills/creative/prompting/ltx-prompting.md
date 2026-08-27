@@ -1,4 +1,4 @@
-# LTX-2 — Prompting Guide
+# LTX-2 / LTX-2.3 — Prompting Guide
 
 > Source: [LTX Official Prompting Guide](https://docs.ltx.video/api-documentation/prompting-guide)
 > For universal vocabulary, see: `skills/creative/video-gen-prompting.md`

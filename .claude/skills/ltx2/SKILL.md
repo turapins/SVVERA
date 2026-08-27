@@ -159,6 +159,14 @@ LTX-2 generates raw clips. Combine with the rest of the toolkit:
 
 ## Setup
 
+> **Status:** `docker/modal-ltx2/app.py` and `tools/ltx2.py` were authored/updated
+> against the LTX-2.3 diffusers pipeline classes (`LTX2Pipeline` /
+> `LTX2ImageToVideoPipeline`) but have not yet been run end-to-end against real
+> Modal + GPU infra. Validate `modal deploy` succeeds and a test generation
+> completes before relying on this in production — diffusers' LTX-2.3 support
+> was still rolling out at write time, so double-check the pinned `diffusers`
+> version in `docker/modal-ltx2/app.py` actually exposes those classes.
+
 ```bash
 # 1. Create Modal secret for HuggingFace (one-time)
 modal secret create huggingface-token HF_TOKEN=hf_your_token
