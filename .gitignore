@@ -82,6 +82,12 @@ Thumbs.db
 # Node (for remotion-composer/)
 node_modules/
 
+# Vendored MCP servers (third-party repos cloned for local tool access —
+# e.g. davinci-resolve-mcp — updated via their own git remote, not ours).
+# Machine-specific absolute paths, not shared repo config.
+.mcp-servers/
+.mcp.json
+
 # Remotion build output and copied project assets (regenerable at render time)
 remotion-composer/out/
 # Project-local bespoke ("atelier") compositions — hand-authored per video,
@@ -107,3 +113,6 @@ venv/
 
 # Local Wan / diffusers GPU environment
 .venv-wan/
+
+# Serena MCP local project cache (machine-specific)
+.serena/
