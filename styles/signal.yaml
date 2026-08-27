@@ -1,0 +1,105 @@
+identity:
+  name: "Signal"
+  category: minimalist
+  mood: "confident, urgent, restrained — one red against black and white"
+  pace: fast
+  best_for: "Business/education YouTube channel — thumbnails, hooks, and short-form that must stop a fast scroll without looking cluttered"
+
+visual_language:
+  color_palette:
+    primary: ["#FF3B30", "#0B0B0D"]
+    accent: ["#FFFFFF", "#FF6B61"]
+    background: "#0B0B0D"
+    text: "#F5F5F5"
+    muted: "#86868C"
+  composition: "asymmetric, subject right-aligned in an identical crop every episode, generous negative space, single focal point per frame"
+  texture: "clean flat, no grain, no gradients except one soft radial glow behind the subject"
+
+typography:
+  headings:
+    font: "-apple-system, SF Pro Display"
+    weight: 800
+    tracking: "-0.02em"
+  body:
+    font: "-apple-system, SF Pro Text"
+    weight: 400
+    line_height: 1.5
+  stat_card:
+    font: "SF Mono"
+    weight: 800
+    size_multiplier: 2.5
+  scale_system: "major_third"
+  weight_matrix:
+    title: 900
+    heading: 800
+    body: 400
+    caption: 500
+
+motion:
+  transitions: ["hard-cut", "red-flash-cut", "snap-scale", "slide-left"]
+  animation_style: "ease-out cubic-bezier(0.22, 1, 0.36, 1), no bounce, no overshoot — confident snap-ins, one element moves at a time"
+  pacing_rules:
+    min_scene_hold_seconds: 1.2
+    max_scene_hold_seconds: 6
+    text_card_hold_seconds: 1.8
+    stat_card_hold_seconds: 2.2
+    transition_duration_seconds: 0.25
+  entrance: "hard scale-in from 1.04 -> 1.0, timed to land on a one-frame red flash at the cut point"
+  exit: "instant cut, no fade — confidence over softness"
+
+audio:
+  voice_style: "clear, energetic, direct — confident authority, minimal filler, brisk pace"
+  music_mood: "driving minimal percussion, low sub-bass pulse, restrained until the hook payoff"
+  music_volume: 0.1
+  sfx_style: "single sharp whip/snap on the red-flash cut only — silence elsewhere, no stock whoosh clutter"
+  ducking_threshold_db: -4
+  voice_variation_allowed: true
+  hero_moment_voice_shift: "slower, lower pitch, half-beat pause before the payoff line"
+  transition_voice_shift: "quick breath, then resume at higher energy immediately after the red-flash cut"
+
+asset_generation:
+  image_prompt_prefix: "clean minimalist studio photography, near-black background, single dramatic red rim light, high contrast, "
+  image_negative_prompt: "cluttered, multiple colors, pastel, low contrast, busy background, warm cream tones, 3d cartoon render"
+  diagram_style: "flat white line work on black, single red highlight per diagram, no gradients"
+  consistency_anchors:
+    - "Signal red (#FF3B30) appears as exactly one solid shape per frame — never a full-frame wash"
+    - "Background is near-black (#0B0B0D), never pure #000000"
+    - "Subject is always right-aligned in the same crop and lens angle across episodes"
+    - "No more than red + white + black on screen at once"
+
+overlays:
+  stat_card:
+    bg: "#17171B"
+    border: "#FF3B30"
+    text: "#F5F5F5"
+    radius: 10
+    shadow: "0 2px 20px rgba(0,0,0,0.5)"
+  key_term:
+    bg: "#1E1E23"
+    text: "#FF3B30"
+    radius: 4
+  code_block:
+    bg: "#0B0B0D"
+    text: "#F5F5F5"
+    highlight: "#FF3B30"
+
+quality_rules:
+  - "Minimum contrast ratio 4.5:1 for all text against background"
+  - "Never more than 3 words on a thumbnail headline"
+  - "Signal red appears as exactly one solid shape per frame, never a background wash"
+  - "Subject crop, lens angle, and framing stay identical episode to episode"
+  - "No gradients anywhere except the single soft radial glow behind the subject"
+  - "Captions: bold sans, one keyword per line in signal red, everything else in white"
+  - "Hold every scene a minimum of 1.2s — fast but never subliminal"
+
+chart_palette:
+  - "#FF3B30"
+  - "#FFFFFF"
+  - "#86868C"
+  - "#FF6B61"
+  - "#4A4A4F"
+  - "#B9A6FF"
+
+color_rules:
+  contrast_validation: true
+  colorblind_safe: true
