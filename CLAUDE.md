@@ -38,6 +38,11 @@ Read [`context/scripts/`](context/scripts/) for winning and losing ad scripts wi
 - **Analysis**: Gemini Vision
 - **Avatars**: HeyGen
 - **Competitor research**: Tryatria (pending access)
+- **Character/visual reference database**: Pinterest — split across two tools because the API and the website support different things:
+  - `pinterest_boards` (real API, works unrestricted) — create boards/pins to build a persistent character database. Only for Vocal Image's **own original images** (Higgsfield generations, produced frames) — that's what Pinterest's `pins_create` endpoint is documented for.
+  - `pinterest_browser_search` (live browser session) — the only way to actually *discover* new public Pinterest content or *curate* (Save) someone else's pin, since Pinterest's API has no public search endpoint at all. Use this, not `pinterest_boards.create_pin`, to save a found reference.
+  - `pinterest_reference` (real API) — searches/reads only Ivan's **own already-saved** pins/boards, not the public platform. Useful for re-finding something already pinned, not for discovery.
+  - One-time setup: create an app at developers.pinterest.com, set `PINTEREST_APP_ID`/`PINTEREST_APP_SECRET` in `.env`, run `python3 scripts/pinterest_auth.py` once.
 
 ### DaVinci Resolve MCP
 
