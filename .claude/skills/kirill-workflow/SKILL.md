@@ -162,8 +162,14 @@ Soul 2.0 earns its place later, when a locked face has to appear across many gen
   grows downward and the button lands under the window edge. Click it by element reference,
   which scrolls it into view first. A coordinate click on the clipped button does nothing and
   reports no error — it reads as "the model rejected my prompt" when it is a layout problem.
-- **Switching the model can wipe the prompt field.** AI Cast → Soul 2.0 cleared it; Soul 2.0
-  → AI Cast kept it. Choose the model first, type the prompt second.
+- **Switching the model can wipe or swap the prompt field.** AI Cast → Soul 2.0 cleared it;
+  Soul 2.0 → AI Cast kept it; switching to Nano Banana Pro handed back a *different* form
+  still holding an older prompt from earlier in the session. There is more than one
+  generation form in the page and each keeps its own text. Choose the model first, then
+  re-read the field before typing, and read it again before pressing Generate.
+- **`cmd+a` selects the whole page unless the field truly has focus.** Click the field by
+  element reference — a coordinate click often misses and the select-all then highlights the
+  sidebar, so the typed prompt lands nowhere and the old one generates instead.
 - **The form can carry another project's state** — a leftover reference image and leftover
   prompt text. Check `References` reads `0/50` before casting an invented face; a stray
   reference overrides the description silently.
@@ -177,8 +183,8 @@ the same file.
 
 ## 4. Create the location
 
-Generate the location on its own, with no characters in frame, in **Cinema Studio →
-Cinematic Locations**. Generating it empty is what fixes the room design, furniture and
+Generate the location on its own, with no characters in frame, using the **Cinematic
+Locations** model (in the model list under Cinematic models). Generating it empty is what fixes the room design, furniture and
 object placement, lighting, colour palette, atmosphere, and the spatial geography that
 later shots have to respect.
 
@@ -269,6 +275,21 @@ Check on the test:
 - overall naturalness.
 
 Describe any errors back to the chat and let it correct the prompt or the scene structure.
+
+### Props
+
+Props do not go to a Soul model. Generate them with **Nano Banana Pro** — verified working:
+three-quarter or overhead product shot, one prop per generation, on a plain neutral grey
+surface with soft directional light, described by material and wear state.
+
+Two things to state positively every time, because both are project constants that a prop
+will otherwise break:
+
+- **Screens are off.** "The screen is switched off and completely dark, a plain black glass
+  panel reflecting only soft ambient light with nothing legible on it." A prop laptop or
+  phone that renders invented interface content puts unapproved claims into the frame.
+- **Nothing is branded.** "Plain unbranded casing, blank surfaces with no text and no logos."
+  Naming a brand to exclude it is what puts it in the picture.
 
 ## 9. Full generation, then upscale (optional)
 
