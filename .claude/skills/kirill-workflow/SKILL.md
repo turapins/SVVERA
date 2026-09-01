@@ -3,14 +3,15 @@ name: kirill-workflow
 description: >
   Kirill's end-to-end process for producing one AI video scene in Higgsfield Cinema Studio:
   a script written in the Markdown ELEMENTS format so Import elements can extract characters,
-  locations and props; a project holding all assets; character sheets and locations generated
-  first and pinned as tagged Elements (@C1, @LOCATION); scene direction built with
+  locations and props; a project whose Project Brief holds every constant; character sheets
+  and locations generated first and pinned as tagged Elements (@C1, @LOCATION); scene
+  direction built with
   CINEDANCE + ACTING SYSTEM + Lira, a short test generation before the full one, final
   generation at 480p, and an optional ByteDance upscale to 1080p at the very end. Use this whenever
   a scene or dialogue video is being generated in Cinema Studio — "сделай сцену", "generate
   this scene", "нужен character sheet", "собери промт для сцены", "сгенерь по процессу
-  Кирилла" — or when a script needs writing or reformatting for Cinema Studio import
-  ("в каком формате писать скрипт", "подготовь скрипт для импорта элементов"). Scene-level
+  Кирилла" — or when a script or a Cinema Studio Project Brief needs writing ("в каком
+  формате писать скрипт", "подготовь скрипт для импорта элементов", "заполни project brief"). Scene-level
   only: it stops at approved 1080p scene files handed to the edit. Not for editing, cutting
   or captioning (see davinci-ad-assembly, embedded-captions), and not for producing a whole
   ad from a reference (see story-ad-from-reference).
@@ -23,7 +24,7 @@ inconsistency from reaching the final generation, and skipping one shows up as a
 face, a changed room, or a broken screen axis three generations later.
 
 ```
-script in import format → project → import elements → character sheets → location
+script in import format → project + brief → import elements → character sheets → location
        → Elements check → scene breakdown (chat) → plan review
        → short test → full 480p → [upscale 1080p]
 ```
@@ -84,6 +85,29 @@ elements, the prompts written, test generations, and final scene versions.
 
 Prepared characters and locations go into that project's **Assets and Elements** so they
 can be reused across scenes without re-uploading or re-creating them.
+
+### Fill the Project Brief
+
+The project carries a **Project Brief** panel — Context, Narrative, Visuals, Production,
+Status, Resources, Notes. Fill it before the first generation. Template, section notes and a
+worked example are in `references/project-brief.md`.
+
+It is the only place the constants true for *every* scene live: the look and grade, the
+camera language, the casting rules, the model and resolution, the project's own Don't list.
+Anything that lands there is not retyped into prompts — and a prompt restating the palette or
+the camera rules is a sign the brief is not being used.
+
+Three layers, and a fact belongs to exactly one:
+
+| Where | What it holds |
+|---|---|
+| Project Brief | true for the whole project |
+| Script `.md` | the elements table and what happens per scene |
+| Scene prompt | only this scene — blocking, action, dialogue, camera |
+
+(Whether Cinema Studio's backend reads the brief is unconfirmed — that claim comes from a
+Google AI Overview, not Higgsfield's documentation. Fill it for the human reason above
+regardless.)
 
 ## 2. Analyse the script
 
@@ -260,6 +284,7 @@ gets split at a cut, not stretched.
 ## Rules that carry the cost
 
 - Script written in the import format, so Elements are extracted and not retyped.
+- Project constants in the brief, never restated in a prompt.
 - Prompt tags copied from Elements, never from the script — the project prefix changes them.
 - Location alone before characters — otherwise the room drifts every shot.
 - Character sheet before any scene — front, back and close-up, or identity won't hold.
