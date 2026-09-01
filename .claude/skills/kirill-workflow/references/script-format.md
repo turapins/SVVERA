@@ -64,15 +64,22 @@ names the problem plainly, then recommends the app.
 
 ## Element IDs after import
 
-**"Include project name in element ID" stays checked.** Imported elements come back
-prefixed with the project name — `@C1` in the script becomes something like
-`@vi_raise_01_C1` in Elements. That is what stops two projects both owning `@C1` in a
-shared library.
+**"Include project name in element ID" stays checked.** Higgsfield's own description:
+*"Adds a short project tag to every element ID, abbreviated from the document title."*
+
+So the prefix is derived from **the title of the document being imported** — abbreviated,
+not copied whole. `@C1` comes back as something like `@vir1_C1`. That is what stops two
+projects both owning `@C1` in a shared library.
+
+This makes the document title load-bearing. Give it a short, unique, already-abbreviation-
+shaped name — the creative code, e.g. `VI_RAISE_01` — so the generated prefix is short,
+predictable and distinct from every other project's. A doc titled "Script final v3 (copy)"
+produces a prefix nobody can read or guess.
 
 **The consequence is a trap:** the tag written in the script is *not* the tag typed into a
-generation prompt. After import, open Elements, copy the real IDs, and use those in the
-scene prompt. A prompt referencing `@C1` when the element is `@vi_raise_01_C1` silently
-loses the reference — the generation runs, the character is simply invented.
+generation prompt, and the exact prefix is only knowable after import. Open Elements, copy
+the real IDs, and use those in the scene prompt. A prompt referencing `@C1` when the element
+is `@vir1_C1` silently loses the reference — the generation runs, the character is simply invented.
 
 ## After importing
 

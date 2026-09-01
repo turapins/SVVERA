@@ -68,10 +68,13 @@ characters extracted under two names, props filed as locations, and whether the 
 descriptions survived. Fix the script and re-import rather than patching Elements by hand —
 the script stays the source of truth.
 
-**Keep "Include project name in element ID" checked**, and read the trap it creates in
-`references/script-format.md`: the imported element becomes `@vi_raise_01_C1`, not `@C1`, so
-prompts must use the real ID from Elements. A prompt pointing at a tag that does not exist
-does not fail — it silently invents the character.
+**Keep "Include project name in element ID" checked.** It "adds a short project tag to every
+element ID, abbreviated from the document title" — so name the document with the creative
+code (`VI_RAISE_01`) and nothing else, or the generated prefix is unreadable. The imported
+element becomes `@vir1_C1`, not `@C1`, and the exact prefix is only knowable after import:
+prompts must use the real ID copied from Elements. A prompt pointing at a tag that does not
+exist does not fail — it silently invents the character. Full note in
+`references/script-format.md`.
 
 ## 1. One project in Cinema Studio
 
@@ -132,8 +135,9 @@ names and individual tags:
 - `@character_2`
 - `@office_location`
 
-With the project prefix on, these read back as `@<project>_character_1` in Elements. Copy
-the real IDs from there into prompts — never retype the short form from the script.
+With the project prefix on, these read back with a short tag abbreviated from the document
+title. Copy the real IDs from Elements into prompts — never retype the short form from the
+script.
 
 From then on, never re-describe appearance, wardrobe or room design in a prompt. Attach the
 Elements and reference their tags in the prompt text — the tag binds the instruction to the
