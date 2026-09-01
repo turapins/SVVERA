@@ -194,6 +194,23 @@ If the script was imported (step 0), the entries already exist with their names,
 descriptions — what they lack is visuals. Attach the generated character sheets and the
 location image to them here.
 
+**The attach path:** element card → **Add element image** → click the drop zone → a media
+picker opens with three tabs, **Uploads / Generations / Liked**. Project generations live
+under **Generations**, newest first, so the earliest characters are a long scroll down.
+Click the sheet, then **Save** in the Edit element dialog.
+
+Two things worth knowing:
+
+- **An element holds more than one image** — a `+` appears beside the attached thumbnail. Use
+  it for several angles of the same character rather than making duplicate elements.
+- **Versions are a field, not a folder.** The Edit element dialog exposes `Version` (a chip,
+  `v1`), and the Element ID is composed from Name + first Scene + Version. Folders in the
+  Elements panel only group; a prompt addresses the element by ID, so two casting variants
+  must differ in `Version` — otherwise both read as `_v1` and a prompt cannot tell them
+  apart. Duplicate the element, change `Version` to `v2`, and the ID follows.
+- `Scene` in that dialog lists **every** scene the element appears in (mother-38 shows
+  1, 5, 9, 13) while the ID carries only the first.
+
 Otherwise add each character sheet and the location to **Elements** by hand, with clear
 names and individual tags:
 
