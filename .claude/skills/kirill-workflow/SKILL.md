@@ -60,18 +60,10 @@ footwear, accessories, front and back view, and a close-up of the face.
 In Cinema Studio this is a two-node graph — a prompt node feeding an image-generation node
 that returns the three panels side by side.
 
-Two variants of the sheet prompt exist, and picking the wrong one wastes a generation:
-
-- **Full preserve** — keeps face, wardrobe, hair, footwear and accessories exactly as in the
-  uploaded reference. Use when the reference person is already dressed for the scene.
-- **Facial identity only** — keeps the face, skin tone, hair and beard, but drops wardrobe,
-  footwear and accessories from the preserve-list so the prompt can dictate new clothing.
-  Use when re-casting the reference person into different wardrobe (e.g. casual photo →
-  business suit).
-
-The two differ only in the preserve-list; everything else is identical. Both are in
-`references/character-sheet-prompt.md`. Use them verbatim, changing only the "omitted
-element" clause and — in the second variant — the specified wardrobe.
+The prompt is in `references/character-sheet-prompt.md`. Use it verbatim, changing only the
+"omitted element" clause. If the character has to be dressed differently from the reference,
+narrow the preserve-list to the face and state the new wardrobe explicitly — that note is in
+the same file.
 
 ## 4. Create the location
 
