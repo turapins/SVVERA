@@ -8,7 +8,9 @@ Nothing is added until it is reviewed, so a bad extraction costs time, not credi
 vague script makes the extractor guess, and guesses arrive as duplicate characters, a prop
 promoted to a location, or three names for one person.
 
-**All scripts are written in the format below, exported as `.md`.**
+**All scripts are written in the format below, exported as `.md`.** The format is verified:
+a 16-element script imported with all 16 extracted, correctly typed and correctly
+scene-stamped, on 2026-09-01.
 
 ## Why Markdown
 
@@ -62,24 +64,46 @@ names the problem plainly, then recommends the app.
 9. **A character introduced mid-script still goes in the table at the top.** The table is
    the complete cast list, not a running one.
 
-## Element IDs after import
+## Element IDs after import — verified 2026-09-01
 
 **"Include project name in element ID" stays checked.** Higgsfield's own description:
 *"Adds a short project tag to every element ID, abbreviated from the document title."*
 
-So the prefix is derived from **the title of the document being imported** — abbreviated,
-not copied whole. `@C1` comes back as something like `@vir1_C1`. That is what stops two
-projects both owning `@C1` in a shared library.
+Verified on a real import (IT_MYS_06, 16 elements, all 16 extracted with correct types). The
+ID scheme is:
 
-This makes the document title load-bearing. Give it a short, unique, already-abbreviation-
-shaped name — the creative code, e.g. `VI_RAISE_01` — so the generated prefix is short,
-predictable and distinct from every other project's. A doc titled "Script final v3 (copy)"
-produces a prefix nobody can read or guess.
+```
+@<type>_<PROJECTTAG>_<name-slug>_s<N>_v<M>
+```
 
-**The consequence is a trap:** the tag written in the script is *not* the tag typed into a
-generation prompt, and the exact prefix is only knowable after import. Open Elements, copy
-the real IDs, and use those in the scene prompt. A prompt referencing `@C1` when the element
-is `@vir1_C1` silently loses the reference — the generation runs, the character is simply invented.
+| Part | Source | Example |
+|---|---|---|
+| `type` | the `Type` column | `char` · `loc` · `prop` |
+| `PROJECTTAG` | abbreviated from the document title | `IT_MYS_06` → `ITM` |
+| `name-slug` | the `Name` column, slugified | `Mother, 38` → `mother-38` |
+| `s<N>` | **the first scene the element appears in** | `_s1`, `_s7`, `_s12` |
+| `v<M>` | version, increments on re-import | `_v1` |
+
+Real examples from that import:
+
+```
+@char_ITM_mother-38_s1_v1      @loc_ITM_family-kitchen_s1_v1
+@char_ITM_boy-11_s1_v1         @loc_ITM_childs-bedroom-desk_s2_v1
+@char_ITM_girl-13_s2_v1        @prop_ITM_returned-math-test_s1_v1
+@char_ITM_mother-35_s7_v1      @prop_ITM_parents-phone_s12_v1
+```
+
+**The scene number is the load-bearing discovery.** It comes from the per-scene
+`**Elements:**` lines — the extractor reads them and stamps each element with the first scene
+it is used in. So rule 6 is not housekeeping: get those lines wrong and every ID is wrong.
+It also means the ID doubles as a running order — sort the Elements panel and you get the
+sequence in which things first have to exist.
+
+**And the trap:** the tag written in the script is *not* the tag typed into a generation
+prompt, and the full ID is only knowable after the import. `@P1` in the script is
+`@char_ITM_mother-38_s1_v1` in the project. A prompt referencing `@P1` does not error — it
+silently loses the reference and the model invents the character. Open Elements, copy the
+real IDs, use those.
 
 ## After importing
 
@@ -93,6 +117,6 @@ The dialog extracts and shows the list for review before adding. Check, in this 
 Fix in the script and re-import rather than patching by hand in Elements — the script stays
 the source of truth, and the next revision re-imports cleanly.
 
-Imported elements arrive as entries with names, tags and descriptions. They still need
-their visuals: character sheets (step 3) and the empty location (step 4) are generated
-afterwards and attached.
+Imported elements arrive as entries with names, tags and descriptions, each showing an
+**Add element image** placeholder. They carry no visuals — character sheets (step 3) and the
+empty locations (step 4) are generated afterwards and attached to these entries.

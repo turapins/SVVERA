@@ -69,13 +69,17 @@ characters extracted under two names, props filed as locations, and whether the 
 descriptions survived. Fix the script and re-import rather than patching Elements by hand —
 the script stays the source of truth.
 
-**Keep "Include project name in element ID" checked.** It "adds a short project tag to every
-element ID, abbreviated from the document title" — so name the document with the creative
-code (`VI_RAISE_01`) and nothing else, or the generated prefix is unreadable. The imported
-element becomes `@vir1_C1`, not `@C1`, and the exact prefix is only knowable after import:
-prompts must use the real ID copied from Elements. A prompt pointing at a tag that does not
-exist does not fail — it silently invents the character. Full note in
-`references/script-format.md`.
+**Keep "Include project name in element ID" checked.** Verified ID scheme:
+`@<type>_<PROJECTTAG>_<name-slug>_s<N>_v<M>` — so `@P1` in a script titled `IT_MYS_06` comes
+back as `@char_ITM_mother-38_s1_v1`. Name the document with the creative code and nothing
+else, or that tag is unreadable.
+
+`s<N>` is the first scene the element appears in, read from the per-scene `**Elements:**`
+lines — which makes those lines load-bearing, not housekeeping.
+
+The full ID is only knowable after the import, so **prompts must use the real ID copied from
+Elements**. A prompt pointing at a tag that does not exist does not fail — it silently
+invents the character. Full note in `references/script-format.md`.
 
 ## 1. One project in Cinema Studio
 
