@@ -138,6 +138,38 @@ footwear, accessories, front and back view, and a close-up of the face.
 In Cinema Studio this is a two-node graph — a prompt node feeding an image-generation node
 that returns the three panels side by side.
 
+### Model choice: AI Cast, not Soul 2.0 — verified 2026-09-01
+
+Both accept a free-text prompt. The difference is what comes back:
+
+| | AI Cast | Soul 2.0 |
+|---|---|---|
+| Returns | **the three-panel sheet directly** — full-body front, full-body back, close-up portrait, flat grey studio backdrop | a single photograph |
+| Also driven by | UI parameters (Genre, Budget in millions, Era, Archetype, Identity, Physical Appearance, Details, Outfit) + Randomize | prompt only |
+| Consistency | the sheet is the reference | Soul ID locks a face across generations |
+| Observed price | 0.375 for 3 sheets at 2K | 0.25 for one image at 2K |
+
+**Use AI Cast for character sheets.** One call produces exactly what step 3 needs, cheaper
+per useful asset, and it reads age honestly — the same prompt in Soul 2.0 came back visibly
+younger and more polished than asked for, which is wrong for ordinary-people casting.
+
+Soul 2.0 earns its place later, when a locked face has to appear across many generations
+(Soul ID), or when the sheet is being built by hand for full control.
+
+### UI traps in this form
+
+- **The Generate button is unclickable by coordinate** once the prompt is long: the form
+  grows downward and the button lands under the window edge. Click it by element reference,
+  which scrolls it into view first. A coordinate click on the clipped button does nothing and
+  reports no error — it reads as "the model rejected my prompt" when it is a layout problem.
+- **Switching the model can wipe the prompt field.** AI Cast → Soul 2.0 cleared it; Soul 2.0
+  → AI Cast kept it. Choose the model first, type the prompt second.
+- **The form can carry another project's state** — a leftover reference image and leftover
+  prompt text. Check `References` reads `0/50` before casting an invented face; a stray
+  reference overrides the description silently.
+- Aspect 9:16 crops the top of the head on a full-body casting frame. State that the whole
+  head sits inside the frame, or use the sheet from AI Cast, which frames it correctly.
+
 The prompt is in `references/character-sheet-prompt.md`. Use it verbatim, changing only the
 "omitted element" clause. If the character has to be dressed differently from the reference,
 narrow the preserve-list to the face and state the new wardrobe explicitly — that note is in
