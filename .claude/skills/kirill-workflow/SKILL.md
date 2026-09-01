@@ -64,12 +64,14 @@ Two variants of the sheet prompt exist, and picking the wrong one wastes a gener
 
 - **Full preserve** — keeps face, wardrobe, hair, footwear and accessories exactly as in the
   uploaded reference. Use when the reference person is already dressed for the scene.
-- **Facial identity only** — keeps the face, age and skin tone, and re-specifies hair,
-  wardrobe and accessories in the prompt (e.g. "dreadlocks, length, texture and styling…",
-  a suit and tie). Use when the character is being re-cast into new wardrobe.
+- **Facial identity only** — keeps the face, skin tone, hair and beard, but drops wardrobe,
+  footwear and accessories from the preserve-list so the prompt can dictate new clothing.
+  Use when re-casting the reference person into different wardrobe (e.g. casual photo →
+  business suit).
 
-Both are in `references/character-sheet-prompt.md`. Use them verbatim, changing only the
-"omitted element" clause and — in the second variant — the re-specified wardrobe and hair.
+The two differ only in the preserve-list; everything else is identical. Both are in
+`references/character-sheet-prompt.md`. Use them verbatim, changing only the "omitted
+element" clause and — in the second variant — the specified wardrobe.
 
 ## 4. Create the location
 
@@ -181,7 +183,8 @@ When it is run: **Upscale → ByteDance Upscale**, with these settings.
 | Preset | **Short Series** |
 
 Preset options are Common / AIGC / Short Series / UGC / Old Film — **Short Series** is the
-one for this work. Resolution goes up to 2K/4K/8K and FPS to 60; leave both alone unless
+canonical one for this work (confirmed 2026-09-01; it supersedes the older `aigc` preset
+used on MES_DRA_05). Resolution goes up to 2K/4K/8K and FPS to 60; leave both alone unless
 there is a specific delivery reason, since both cost more and 30fps 1080p is what the edit
 expects.
 

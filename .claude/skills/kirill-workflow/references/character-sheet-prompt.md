@@ -19,17 +19,28 @@ Create a professional photorealistic three-panel film character sheet based stri
 
 ---
 
-## Variant B — facial identity only (re-cast into new wardrobe)
+## Variant B — facial identity only (new wardrobe)
 
-Use when the character keeps the reference face but needs different hair, wardrobe or
-styling. Same structure, but the preserve-list is cut down to the face and the new styling
-is specified explicitly. Change the bracketed parts:
+Use when the character keeps the reference person's face and physical features but has to
+be dressed differently — e.g. a reference photo in casual clothes re-cast into a business
+suit for the scene.
+
+The difference from Variant A is **only in the preserve-list**. Variant A preserves
+"…hairstyle, body proportions, **wardrobe, footwear, wearable accessories**, grooming…" —
+Variant B stops at the physical person and lets the prompt dictate the clothing.
+
+The opening is verbatim from Kirill's node; the rest below the marked line is reconstructed
+from Variant A's skeleton and should be replaced with his full text when available.
 
 > Create a professional photorealistic three-panel film character sheet based strictly on
-> the uploaded reference image for facial identity only. Preserve the exact facial identity,
-> facial structure, age and skin tone of the referenced person. [HAIR: e.g. dreadlocks —
-> state length, texture and styling.] [WARDROBE: e.g. a charcoal two-piece suit, white
-> shirt, patterned tie, black leather shoes — state design, colours, materials and fit.]
+> the uploaded reference image **for facial identity only**. Preserve the exact facial
+> identity, facial structure, age, skin tone, dreadlocks (length, texture and styling
+> exactly as shown), beard and distinctive p[hysical features]…
+
+*— verbatim ends here; continue with:*
+
+> [WARDROBE: state the new clothing explicitly — design, colours, materials, fit, footwear,
+> e.g. a charcoal two-piece suit, white shirt, patterned tie, black leather shoes.]
 > Both hands remain completely empty, and no bag appears anywhere in the image.
 > Arrange three vertical photographs side by side: Left panel: a complete full-body front
 > view, standing straight in a relaxed neutral pose, facing forward, both empty arms resting
@@ -46,6 +57,10 @@ is specified explicitly. Change the bracketed parts:
 > falloff, realistic unretouched skin with visible natural texture, detailed fabric and
 > restrained neutral colours. Clean contemporary casting photography with no decorative
 > elements, captions or text.
+
+Note that hair and beard are **preserved from the reference** in this variant too — only
+the clothing is new. Do not re-describe the hair unless the character is genuinely being
+restyled.
 
 ---
 
