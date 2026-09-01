@@ -2,13 +2,15 @@
 name: kirill-workflow
 description: >
   Kirill's end-to-end process for producing one AI video scene in Higgsfield Cinema Studio:
-  a project holding all assets, the script broken into scenes, character sheets and locations
-  generated first and pinned as tagged Elements (@C1, @LOCATION), scene direction built with
+  a script written in the Markdown ELEMENTS format so Import elements can extract characters,
+  locations and props; a project holding all assets; character sheets and locations generated
+  first and pinned as tagged Elements (@C1, @LOCATION); scene direction built with
   CINEDANCE + ACTING SYSTEM + Lira, a short test generation before the full one, final
   generation at 480p, and an optional ByteDance upscale to 1080p at the very end. Use this whenever
   a scene or dialogue video is being generated in Cinema Studio — "сделай сцену", "generate
   this scene", "нужен character sheet", "собери промт для сцены", "сгенерь по процессу
-  Кирилла" — or when a script needs turning into Cinema Studio scene prompts. Scene-level
+  Кирилла" — or when a script needs writing or reformatting for Cinema Studio import
+  ("в каком формате писать скрипт", "подготовь скрипт для импорта элементов"). Scene-level
   only: it stops at approved 1080p scene files handed to the edit. Not for editing, cutting
   or captioning (see davinci-ad-assembly, embedded-captions), and not for producing a whole
   ad from a reference (see story-ad-from-reference).
@@ -21,12 +23,55 @@ inconsistency from reaching the final generation, and skipping one shows up as a
 face, a changed room, or a broken screen axis three generations later.
 
 ```
-project → script analysis → character sheets → location → Elements
-       → scene breakdown (chat) → plan review → short test → full 480p → [upscale 1080p]
+script in import format → project → import elements → character sheets → location
+       → Elements check → scene breakdown (chat) → plan review
+       → short test → full 480p → [upscale 1080p]
 ```
 
 **Scope.** This skill covers one scene, from empty project to an approved 1080p file. It
 does not cut, join, caption or sound-design — approved scenes are handed to the edit.
+
+## 0. Write the script in the import format
+
+Cinema Studio can read the script and pull characters, locations and props straight into
+Elements — **Import elements**, which accepts `.pdf`, `.xlsx`, `.csv`, `.docx`, `.txt` and
+`.md`. Nothing is added until the extraction is reviewed.
+
+That only works if the script is written for it. **All scripts are written in Markdown with
+an `## ELEMENTS` table at the top and tagged scenes below** — the full spec, rules and a
+fillable template are in `references/script-format.md`.
+
+Short version:
+
+```markdown
+# PROJECT: VI_RAISE_01
+
+## ELEMENTS
+
+| Type | Tag | Name | Description |
+|---|---|---|---|
+| Character | @C1 | Anna, 32 | Marketing manager. Reserved. Casual office wear. |
+| Location | @OFFICE | Open-plan office, day | Glass partitions, daylight from the left. |
+| Prop | @CUP | Paper coffee cup | Plain white, no logo. |
+
+## SCENE 1 — @OFFICE, day
+**Elements:** @C1, @CUP
+**Duration:** 24s
+**Action:** …
+**Dialogue:**
+@C1: "…"
+```
+
+The import runs once the project exists (step 1), and it does most of step 2 and step 5
+automatically. Review the extracted list before adding: check the count, duplicate
+characters extracted under two names, props filed as locations, and whether the visual
+descriptions survived. Fix the script and re-import rather than patching Elements by hand —
+the script stays the source of truth.
+
+**Keep "Include project name in element ID" checked**, and read the trap it creates in
+`references/script-format.md`: the imported element becomes `@vi_raise_01_C1`, not `@C1`, so
+prompts must use the real ID from Elements. A prompt pointing at a tag that does not exist
+does not fail — it silently invents the character.
 
 ## 1. One project in Cinema Studio
 
@@ -39,7 +84,9 @@ can be reused across scenes without re-uploading or re-creating them.
 
 ## 2. Analyse the script
 
-Read the whole script first, then split it into scenes. For each scene write down:
+Writing the script in the import format (step 0) is this analysis, done up front — the
+`## ELEMENTS` table and the per-scene `**Elements:**` lines are exactly the list below.
+Re-read the whole script anyway before generating, and confirm for each scene:
 
 - which characters appear;
 - the location;
@@ -74,12 +121,19 @@ later shots have to respect.
 
 ## 5. Add characters and location to Elements
 
-Add each character sheet and the location to **Elements** inside the project, with clear
+If the script was imported (step 0), the entries already exist with their names, tags and
+descriptions — what they lack is visuals. Attach the generated character sheets and the
+location image to them here.
+
+Otherwise add each character sheet and the location to **Elements** by hand, with clear
 names and individual tags:
 
 - `@character_1`
 - `@character_2`
 - `@office_location`
+
+With the project prefix on, these read back as `@<project>_character_1` in Elements. Copy
+the real IDs from there into prompts — never retype the short form from the script.
 
 From then on, never re-describe appearance, wardrobe or room design in a prompt. Attach the
 Elements and reference their tags in the prompt text — the tag binds the instruction to the
@@ -201,6 +255,8 @@ gets split at a cut, not stretched.
 
 ## Rules that carry the cost
 
+- Script written in the import format, so Elements are extracted and not retyped.
+- Prompt tags copied from Elements, never from the script — the project prefix changes them.
 - Location alone before characters — otherwise the room drifts every shot.
 - Character sheet before any scene — front, back and close-up, or identity won't hold.
 - Describe only action in prompts; identity lives in Elements.

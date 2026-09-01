@@ -4,6 +4,11 @@ A real 24-second, two-character, two-shot dialogue prompt (Vocal Image, outdoor 
 Copy the section order and the level of specificity; replace the content.
 `@` is always a tag of an Element — a character, a location or a prop.
 
+**Use the real element ID from Elements, not the short tag from the script.** With the
+project prefix on, `@C1` in the script is `@vi_raise_01_C1` in the project. A prompt
+pointing at a tag that does not exist does not error — the character is silently invented.
+See `script-format.md`.
+
 The scene ships with a **first-frame still** generated before the video — the opening
 blocking, exactly as `FIRST FRAME AND SPATIAL BLOCKING` describes it. Check that still
 first: if screen-left/screen-right or the eyelines are wrong there, they are wrong in every
