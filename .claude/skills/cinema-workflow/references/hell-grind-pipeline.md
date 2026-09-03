@@ -210,3 +210,28 @@ HELL GRIND began as a short series and grew into a feature; the formula came tog
 end, and the brief is written as the version they would use from day one. Every rule in it exists
 because a shot failed without it — which is exactly the standard we have been holding
 `dialogue-prompt.md` to.
+
+
+---
+
+# Which Higgsfield originals actually carry a brief
+
+Checked 2026-09-03. Only four of the Original Series titles publish a written production brief;
+the rest are episode pages with a synopsis, a player and comments, and nothing about method.
+
+| Title | Brief? | URL pattern |
+|---|---|---|
+| HELL GRIND | yes — the origin, most detailed | `/original-series/hell-grind/episode-1` |
+| THE CULLY HILL BOYS | yes — most operational | `/original-series/cully-hill-boys/full-film` |
+| ONEIRIC | yes — inside Cinema Studio, read-only | `/generate?projectId=85a0f627-…&brief=1` |
+| ADILIADA | yes — mostly repeats ONEIRIC | `/original-series/adiliada/full-film` |
+| MORK | **no** | `/original-series/mork/episode-1` |
+| ARENA ZERO | **no** | `/original-series/arena-zero/episode-1` |
+| Behind The Scenes of "Mork" | **no** — a comedy reel, not a breakdown | `/original-series/behind-the-scenes-of-mork-the-tale-of-kael/episode-0` |
+
+Note the slug is inconsistent — some titles are `/full-film`, some `/episode-1`. The reliable way
+to find one is the index at `/original-series` plus the `find` tool; guessing a slug returns 404.
+
+The remaining untried titles (ZEPHYR, The Trigger, DINOFORCE, BUDDY, MISFORTUNE and the rest of
+the recommended rail) are unchecked. Given that four briefs already repeat each other heavily,
+the expected yield from another one is low — check one only if a specific problem is unsolved.
