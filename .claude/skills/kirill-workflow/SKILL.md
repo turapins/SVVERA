@@ -156,6 +156,22 @@ younger and more polished than asked for, which is wrong for ordinary-people cas
 Soul 2.0 earns its place later, when a locked face has to appear across many generations
 (Soul ID), or when the sheet is being built by hand for full control.
 
+### Attaching Elements to a generation
+
+Type `@` in the prompt field. A picker opens with **Uploads / Elements / Generations /
+Liked** tabs; the **Elements** tab lists the project's own characters, locations and props
+with Characters / Locations / Props filters and the folder list. This is how identity gets
+into a generation — the prompt text alone does not bind an element.
+
+**Trap:** clicking the middle of an element tile opens a Status menu (In progress / Needs
+review / Approved) instead of selecting it, and the picker dismisses. Selection is on a
+different part of the tile — verify the `References` counter increments before generating.
+A generation that runs with `References 0/50` invents every character.
+
+**Set audio to Off.** The control sits in the settings row beside the duration. Video models
+will otherwise synthesise a voice per clip, which is useless for a VO-driven piece and
+cannot be removed afterwards.
+
 ### UI traps in this form
 
 - **The Generate button is unclickable by coordinate** once the prompt is long: the form
@@ -275,7 +291,12 @@ If the scene is long or technically hard, generate a shortened trial version fir
 containing the most important or most difficult fragment.
 
 There is deliberately **no fixed second-count that makes a scene "long"** — it is a
-judgment call in the moment. A hook can be 3.5 seconds, 15 seconds or the full 30. What
+judgment call in the moment. And pick the test fragment for *difficulty*, not for
+importance: testing a static two-shot proves the elements bound and nothing else. The
+fragment worth 15 credits is the one with the hard cut, the second character entering, or
+the light changing. When the test would only cover the easy part, skip it and treat the
+first full pass as the test — at ~2.5 credits per second the difference is small and a full
+pass returns diagnostics on every shot at once. A hook can be 3.5 seconds, 15 seconds or the full 30. What
 decides it is difficulty: number of characters, number of cuts, how much dialogue has to
 lip-sync, whether the camera changes side. A 30-second single-shot monologue may need no
 test; a 12-second two-hander with a hard cut usually does.
