@@ -180,6 +180,7 @@ def sample_artifact(name: str) -> dict:
                     "out_seconds": 10,
                 }
             ],
+            "render_runtime": "ffmpeg",
         }
     if name == "render_report":
         return {
