@@ -232,3 +232,55 @@ running reaction to every take. And on grading:
   including the ones inside a "no".
 - **Direct, don't describe** — scene event, motive, goal, obstacle, tactic. "The director's
   craft is the one part the model can't invent for you yet."
+
+---
+
+# ADILIADA — the same pipeline again, plus two additions
+
+`higgsfield.ai/original-series/adiliada/full-film` — a ~6-minute photoreal short built as a
+series opening, 11,299 assets. Its brief restates ONEIRIC almost point for point: the same
+two-pass character sheet with the untouched base portrait, the same twelve-block CINEDANCE
+order with GAZE / EYELINES, the same five post stages, the same closing rules. That repetition
+is itself useful — it means those parts are settled practice, not one film's experiment.
+
+Two things are new.
+
+## The depth map — a second geometry channel
+
+Alongside the blocking diagram, they feed a **depth map**: a black-and-white image where light
+areas are near and dark areas are far. The model reads it as the depth skeleton of the scene,
+which buys correct composition, volume and proportion. Their stated failure without it is the
+space drifting — a location that rearranges itself every few seconds.
+
+So there are two separate non-textual controls, and they solve different problems: the
+**blocking diagram** fixes *who is where in the frame*; the **depth map** fixes *how deep the
+room is and how the bodies sit in that depth*. Reach for the depth map when a shot has real
+foreground/background separation to hold, or when a space keeps reshaping between takes.
+
+## Hold the face, change everything else
+
+ADILIADA's hero exists in several universes, each version with its own look and personality, and
+the production rule is stated as a law:
+
+> A new universe is a new look, not a new person. The base is never touched.
+
+Alternate versions are built from **the same base face pixels**; wardrobe, makeup, hair, scars
+and damage all change around it. That is the same rule as "a new state is a new asset", pushed
+further: it also covers casting variants, aged/de-aged versions, and a character appearing as
+himself in a different register. Directly applicable to our v1/v2/v3 casting folders and to
+reworks — a variant is a re-dress of a locked face, never a re-generation of it.
+
+## And one independent confirmation
+
+ADILIADA plants **visual anchors** in every scene and location for the same stated reason Cully
+Hill gives — "the chair a character sits in, the window two of them talk by" — objects that hold
+a scene consistent and keep characters in the same places across generations. Two of three
+briefs name the anchor rule independently, so treat it as a law rather than a preference.
+
+They also run a **unification pass over the location set before generating**: once the plates
+exist they are edited for colour, light and saturation so the whole set matches in character.
+Cheaper than discovering the mismatch in the grade.
+
+Their development stage adds one line worth keeping: after the drama pass the project goes into
+a step-by-step storyboard, because only on the storyboard does it become clear how good a scene
+really is, as opposed to how good it was in your head.
