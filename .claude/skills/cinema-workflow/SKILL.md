@@ -33,6 +33,7 @@ their kind:
 |---|---|---|
 | `references/oneiric-pipeline.md` | ONEIRIC (20 min) + ADILIADA (6 min) | the short-form pipeline, the two-pass character sheet, the blocking diagram, the depth map |
 | `references/cully-hill-pipeline.md` | THE CULLY HILL BOYS (1h54m, 137 scenes, 473k generations) | everything operational — sheet construction, the video stress test, location kits, the master shot and spatial map, optics anchors, named locks, production discipline, music lip-sync |
+| `references/hell-grind-pipeline.md` | HELL GRIND (95 min, 15 people, 14 days of generation, Cannes) | the origin brief — prompt length and the per-beat limit, naming the role of every reference, the age ban, the Style Prefix, how a dialogue line is built, scale anchors |
 
 ONEIRIC is also where the `tig-scene-engine`, `tig-acting-task` and `tig-blocking-map` skills in
 this repo come from: they are the playbooks those films were made with, not third-party add-ons.
@@ -144,6 +145,20 @@ camera language, the casting rules, the model and resolution, the project's own 
 Anything that lands there is not retyped into prompts — and a prompt restating the palette or
 the camera rules is a sign the brief is not being used.
 
+### Two project constants that live next to the brief
+
+Both are pasted into every prompt word for word, and both exist so that one edit updates every
+shot at once:
+
+- **A Style Prefix** — one block covering style, cinematography, lighting, the colour ratio,
+  camera, skin, acting, physics, composition, continuity, technical and audio, closed with the
+  technical tags (`Photoreal. NON-IP. <aspect>. <duration>s. SFX only. NO CGI. Cinematic.`).
+  `SFX only. No music.` is mandatory in it: a generated soundtrack only fights the edit, and
+  continuous ambience laid in post is what glues generated shots into one space.
+- **A ban dictionary** — words this project has caught the model punishing, with their
+  replacements: *dark* → *low key*, *jolting* → *rapid motion*. Add to it whenever a word
+  demonstrably drags a generation somewhere unwanted.
+
 Three layers, and a fact belongs to exactly one:
 
 | Where | What it holds |
@@ -242,6 +257,26 @@ From the feature brief, all of them the result of a shot failing:
   and stops reacting to the real one.
 - **Hands stay empty on the sheet.** Every object is its own asset — a prop born inside a sheet
   can never be dropped, thrown or taken away.
+
+### Keep the sheet boring on purpose
+
+The counterpoint to baking the look into the location plate:
+
+> The cinema look does not live in the character sheet — it lives in the locations and in the
+> video prompts.
+
+Neutral grey, flat light, real skin with visible pores, no retouch. Bake film grain or a
+cinematic lens into a sheet and the character carries that look into every scene and **stops
+reacting to new light**. So: the look goes into the plate, never into the person.
+
+When the model returns several versions of a face, **pick the most believable, not the most
+beautiful** — a beautiful-but-fake face shows its fakeness later in video, when it is too late.
+And check the eyes: even dark ones need a catch-light in the pupil, or the face reads dead and
+no video model can act with it.
+
+The reason the base is never re-run, stated properly: every extra pass destroys texture and
+drifts colour, and after two passes a face turns symmetrical, plastic and lifeless — which then
+shows up as bad acting in video.
 
 ### Stress-test the sheet with video, not with your eyes
 
@@ -568,6 +603,35 @@ zone is **29–84°** and comes out reliably; outside it the risk starts. Three 
   the camera distance in metres, the background compressed to a colour wash, and mandatory
   foreground occlusion filling the lower third to half of frame.
 
+### Never write an age, in any language
+
+> The content filter becomes much stricter the moment it reads a minor; instead of age, give the
+> role, the clothes, the action.
+
+We lost generations to exactly this. No ages anywhere in a prompt or a sheet description — a
+young character is described by role, wardrobe and behaviour.
+
+### How long a prompt should be
+
+Their feature prompts ran **3,000–4,000 words**, and the constraint is not length:
+
+> Length is not the enemy; an overloaded beat is.
+
+**Up to three sentences per beat.** Overload one and the model smears it. Present tense, short
+sentences, camera written inside the action rather than in a paragraph of its own. So a prompt
+gets longer by gaining more beats and more blocks — never by packing more into one beat.
+
+### Name the role of every reference
+
+Otherwise the model decides for itself and decides wrong — it copies the composition instead of
+the face, or the face instead of the colour palette:
+
+```
+@char_… for character reference
+@loc_… for location reference — take only the space and the texture: do not use as a starting
+frame, do not inherit the composition, the angle or the colour.
+```
+
 ### Three prompt rules that break generations more than anything else
 
 1. **Every tag appears exactly once, inside ACTIVE REFERENCES.** A duplicated tag at the end of a
@@ -577,6 +641,33 @@ zone is **29–84°** and comes out reliably; outside it the risk starts. Three 
    near-copy of the plate.
 3. **Reference budget per generation: 9 images, 3 videos, 3 audio.** That budget decides how many
    named characters can share a shot — build the shot list around it.
+
+### Speech lives only in the audio block
+
+A dialogue line is built in four parts, always in this order: **the voice and its emotion → the
+line in quotes → the physical action → the facial reaction.** And the separation is hard:
+
+> Lines live only in the audio section of the prompt — not one word of speech inside the action.
+
+Because the model adds its own filler — "uhm", chuckles, whole invented phrases — the prompt
+carries an explicit block: everyone speaks **only** the quoted line, anyone without a line stays
+completely silent, and a half-laugh written into the action is a facial expression **with no
+sound**. Write the mix as well — voices clean and close to the microphone, ambience underneath,
+ambience dipping when someone speaks — and give rare names a phonetic transcription.
+
+Seam technique: **open every new generation with the line that closed the previous one.** The
+emotion crosses the cut along with the text.
+
+### Count everything that can duplicate
+
+SCENE CONTEXT opens with a literal header — `EXACT 3 CHARACTERS — NO DUPLICATES: …` — because the
+model adds extra people and clones furniture. Only characters whose references are in the prompt
+exist in the frame, and set dressing gets its own count lock: exactly one of a thing, never a
+second. Props duplicate in motion, so counts are written frame by frame.
+
+Anything much larger than a human needs **two** anchors at once — a written size comparison *and*
+a human figure in frame to measure against. With only one, the model quietly shrinks it back
+toward human height.
 
 ### Add a GAZE / EYELINES block
 
