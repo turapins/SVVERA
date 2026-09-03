@@ -119,3 +119,9 @@ venv/
 
 # Daily competitor-creative collection (regenerable from Atria API)
 data/competitor_refs/
+
+# Local HTML mockups served by the `mockups` launch.json config on :4788.
+# The directory itself stays tracked (via .gitkeep) because python -m
+# http.server refuses to start when --directory points at a missing path.
+/mockups/*
+!/mockups/.gitkeep
