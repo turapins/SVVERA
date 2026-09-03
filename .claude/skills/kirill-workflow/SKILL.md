@@ -24,9 +24,11 @@ inconsistency from reaching the final generation, and skipping one shows up as a
 face, a changed room, or a broken screen axis three generations later.
 
 ```
-script in import format → project + brief → import elements → character sheets → location
-       → Elements check → scene breakdown (chat) → plan review
-       → short test → full 480p → [upscale 1080p]
+script in import format → project + brief → import elements
+       → [voice-over first, if VO-driven: measure real scene timings]
+       → character sheets → locations → props → Elements check
+       → scene breakdown (CINEDANCE + ACTING + Lira) → group scenes into blocks
+       → plan review → short test → full 480p → [upscale 1080p]
 ```
 
 **Scope.** This skill covers one scene, from empty project to an approved 1080p file. It
@@ -125,6 +127,29 @@ Re-read the whole script anyway before generating, and confirm for each scene:
 - the dialogue and rough duration;
 - the key action, and the result the shot has to deliver.
 
+### If the piece is voice-over driven, record the voice-over first
+
+Scene durations written from reading a script are guesses, and they are wrong by a lot. On
+IT_MYS_06 the scripted 194 seconds came back as a 126-second read — roughly 35% shorter. Had
+the clips been generated against the scripted numbers, every one of them would have been cut
+to fit or thrown away.
+
+So for a VO piece the order inverts: **voice first, timings measured off it, picture cut to
+those numbers.**
+
+1. Generate the whole narration in one continuous pass, not per scene — a continuous read is
+   what makes lines flow across cuts, which is the format's whole rhythm.
+2. Use a timestamped endpoint (`/v1/text-to-speech/{voice}/with-timestamps` on ElevenLabs)
+   and map each scene's text span onto the character alignment. That gives exact in/out
+   points measured from the take that will actually be used, not from separate per-scene
+   renders, which drift.
+3. Rewrite the durations in the script and the brief before generating anything.
+
+Two things that cost time when skipped: Voice Design previews read markedly slower than the
+finished voice does at speed 1.0, so do not size scenes from a preview; and audio generated
+inside a video clip cannot be replaced, so a VO piece generates its clips silent or ignores
+their audio.
+
 ## 3. Prepare the characters
 
 Source characters either from the winners database or generate them **inside Cinema
@@ -210,6 +235,11 @@ settings row beside the duration.
   grows downward and the button lands under the window edge. Click it by element reference,
   which scrolls it into view first. A coordinate click on the clipped button does nothing and
   reports no error — it reads as "the model rejected my prompt" when it is a layout problem.
+- **Duration is a slider, not a number field, and `Return` submits the form.** It looks like
+  a text box showing `30s`. Typing into it puts the digits in the *prompt* instead, and
+  pressing Return to commit fires the generation — twice over, that cost two unwanted
+  30-second renders. Drive it as a slider: focus it, `Home` jumps to the 4-second minimum,
+  then arrow keys step up. (Clicking the number and typing also works by hand.)
 - **Switching the model can wipe or swap the prompt field.** AI Cast → Soul 2.0 cleared it;
   Soul 2.0 → AI Cast kept it; switching to Nano Banana Pro handed back a *different* form
   still holding an older prompt from earlier in the session. There is more than one
@@ -354,6 +384,31 @@ below 4.
 Shared skills folder:
 https://drive.google.com/drive/folders/1b3ybyZE4TyX6xoPisdcyYvmLtfmkcBxK?usp=share_link
 
+## 6b. Group scenes into generations by location and cast
+
+Kirill's method is one generation per scene. When several scenes share a room and a cast,
+they can go into **one generation as a multi-shot block** and be cut apart afterwards, up to
+the single-prompt maximum.
+
+This does not save money — video is billed by the second, so the same total length costs the
+same either way. It buys something better: everything shot in that room comes out of one
+pass, so the room, the light and the faces are identical across those scenes by construction
+rather than by hoping the Elements hold.
+
+**Group by location AND cast, never by position in the timeline.** Slicing the running order
+into 30-second chunks puts a location change inside a generation, which is where the model
+breaks. On IT_MYS_06 the fourteen scenes regrouped into six generations: kitchen (4 scenes,
+one mother present throughout), bedroom (3, one girl), dining (3, one boy), and the living
+room left as three separate single shots because each of its scenes has a *different* solo
+character — one generation asked to produce three different people in sequence tends to morph
+one into another.
+
+Then write an edit-order table mapping each block's shots back to their timeline positions,
+with the measured VO in/out points, so the editor never has to work it out.
+
+What it costs: a failure now wastes the whole block rather than one scene. Test the hard
+fragment first when the block has several casts or a light change in the middle.
+
 ## 7. Review the plan before generating
 
 Read the proposed plan and fix anything that doesn't fit — in chat, before spending a single
@@ -417,6 +472,24 @@ will otherwise break:
 - **Nothing is branded.** "Plain unbranded casing, blank surfaces with no text and no logos."
   Naming a brand to exclude it is what puts it in the picture.
 
+### Some constraints do not take — restage instead of repeating
+
+A written rule the model keeps overriding is not fixed by writing it a third time. On
+IT_MYS_06 "both bodies face the counter, not each other" was stated in the shot and repeated
+in POSITIVE CONSTRAINTS, and both takes still turned the two adults into a conversational
+two-shot. Two people side by side facing away is apparently a strong default the language
+does not beat.
+
+When that happens, change the staging so the wrong version is physically impossible — put
+them at opposite ends of the room, or give one of them a task that cannot be done while
+turned around — rather than spending another generation on stronger wording. Two failed
+attempts is the signal to restage.
+
+By contrast, constraints the model *does* honour reliably once stated precisely: a prop kept
+off a surface ("the point hovering a clear centimetre above the paper and never touching it
+at any moment"), screens left dark and unreadable, mouths closed, and action already in
+progress after a cut.
+
 ## 9. Full generation, then upscale (optional)
 
 After a passing test, restore the full dialogue and full duration and run the final
@@ -467,6 +540,9 @@ gets split at a cut, not stretched.
 ## Rules that carry the cost
 
 - Script written in the import format, so Elements are extracted and not retyped.
+- Voice-over recorded and measured before any picture, on a VO-driven piece.
+- Scenes grouped into generations by location and cast, never by timeline position.
+- Prompts pasted, never typed — tags only resolve on paste.
 - Project constants in the brief, never restated in a prompt.
 - Prompt tags copied from Elements, never from the script — the project prefix changes them.
 - Location alone before characters — otherwise the room drifts every shot.
