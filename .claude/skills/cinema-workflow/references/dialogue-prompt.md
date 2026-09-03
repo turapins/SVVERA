@@ -481,3 +481,111 @@ axis of it matches the master — shoulder side, or what is behind each face —
 the prompt has been able to control in either direction. Treat it as a check, not an
 instruction: look at the first frames of an OTS pair before paying for the full generation,
 and regenerate rather than rewording.
+
+---
+
+# Variant F — a seven-shot podcast, run twice on the same prompt
+
+Sixth and seventh videos: the *same prompt text*, generated twice. 29 seconds, two people at a
+podcast table, seven fixed shots, both characters speaking, a supplied starting-frame image and
+a very heavy prop map. Running one prompt twice is the only way to separate "the instruction
+works" from "it worked once", so this pair is worth more than any single result.
+
+## New techniques in the prompt itself
+
+**A supplied image as the starting frame.**
+
+```
+Use the @Image 1 as the exact starting frame.
+Preserve the same host and guest, identities, wardrobe, accessories, seated positions,
+posture, eyelines, podcast table, studio architecture, lighting, camera perspective and
+color. Do not reconstruct, mirror or reinterpret the starting frame.
+```
+
+This is the mechanism behind `@LAST_FRAME` chaining, used here to continue a conversation from
+a previous generation. Identity and set carried across perfectly — but see below for what the
+0.4-second "hold the frame" shot actually produced.
+
+**An IMMUTABLE PROP MAP for anything two characters could share.** Nine sentences for two
+microphones:
+
+```
+MICROPHONE 1 belongs exclusively to @host and remains mounted to the host's side with its
+own boom arm. MICROPHONE 2 belongs exclusively to @guest ... on a separate boom arm.
+The microphones never switch sides, exchange owners, move, merge, duplicate, disappear or
+transform. There is never one shared microphone or one central microphone for both
+characters. The two boom arms remain attached to opposite sides and never cross.
+Neither character touches, moves or adjusts either microphone.
+In every two-shot, both microphones are clearly visible in their correct positions.
+In close shots, the featured character's own microphone remains visible. The other
+microphone may appear only as a geographically correct foreground object.
+```
+
+The load-bearing sentence is `There is never one shared microphone` — it names the exact thing
+the model wants to do (collapse two props into one central one). The general form: ownership,
+then the specific list of banned transformations, then what must be visible in each shot size.
+
+**SPEAKER LOCK as a line inventory.** Beyond the per-shot locks, a closing section lists every
+line each character is permitted to say, followed by `The host never speaks the guest's lines.`
+Both takes obeyed the inventory.
+
+**A menu of listener behaviour, a ban list, and an anti-checklist clause.** Seven allowed
+behaviours (brief genuine smiles, small amused reactions, subtle eyebrow movement, responsive
+eye contact, occasional nods, small posture adjustments, relaxed hand gestures), then eight
+banned ones (constant smiling, repeated nodding, emotionless listening, fixed serious faces,
+mechanical gestures, abrupt pose changes, twitching, theatrical overacting) — and crucially:
+
+```
+Movements emerge organically rather than appearing as separate assigned actions.
+One reaction develops naturally at a time.
+```
+
+Without that last pair the menu gets *performed*, in order, as a sequence of tics. Any time a
+prompt gives a list of behaviours, it needs this clause underneath it.
+
+**Emphasis written at word level.** `Use natural vocal emphasis on: "stop freezing," "stay
+calm," "answer clearly," "handle yourself."` — and the host's arc compressed to four words:
+`engaged curiosity → growing enthusiasm → practical motivation → readiness to begin.`
+
+## What the duplicate proves
+
+**Stable across both takes** — treat these as genuinely controlled:
+
+- both identities, wardrobe, glasses, jewellery, hair — indistinguishable between takes;
+- microphone ownership and sides — held in all seven shots, in both takes;
+- the seven-shot structure and the cut points;
+- the dialogue and who speaks it;
+- the studio's overall look and lighting.
+
+**Different between the two takes** — luck, not control:
+
+- one boom arm is simply missing from the final two-shot in take A and present in take B,
+  despite `the two boom arms remain attached to opposite sides`. Prop *ownership* is
+  controllable; prop *mechanical attachment* is not;
+- the set dressing behind the over-the-shoulder shots differs between takes, and also drifts
+  *within* each take — warm shelving in one shot, a dark studio wall in another;
+- **take A lost a shot assignment**: at 23.5 seconds, where shot 6 should have cut to the host
+  asking "What's the first step?", it is still on the guest mid-sentence. Take B cut correctly.
+  A seven-shot structure with cuts specified to a tenth of a second still comes back with one
+  shot wrong roughly half the time.
+
+**Wrong in both takes, identically** — which means the prompt, not variance:
+
+Every named foreground-shoulder edge came back mirrored. The prompt asks for the guest's
+shoulder at the *right* edge in shots 2, 4 and 6 and the host's at the *left* in shots 3 and 5;
+both takes produced the opposite in every one of them.
+
+That is now the third scene in a row (see Variants D and E). **Stop writing the edge.** The
+model builds an internally consistent reverse-angle geometry and chooses the side itself; the
+sentence naming a left or right edge has never once carried. Write which character is in the
+foreground and which is sharp, and check the side on the first frame if it has to match a
+neighbouring block.
+
+## And what the starting frame actually did
+
+Neither take reproduced shot 1 as written — a 0.4-second hold on the supplied two-shot. Both
+opened directly on a close-up of the host instead. Identity, wardrobe and set all carried, so
+the image was read as an identity and style seed rather than as a literal opening frame.
+
+Practical: a starting frame is worth attaching, but do not spend a shot on holding it. Let
+shot 1 be real content and let the image do its work underneath.
