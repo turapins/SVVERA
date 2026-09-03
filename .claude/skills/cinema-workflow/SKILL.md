@@ -1,5 +1,5 @@
 ---
-name: kirill-workflow
+name: cinema-workflow
 description: >
   Kirill's end-to-end process for producing one AI video scene in Higgsfield Cinema Studio:
   a script written in the Markdown ELEMENTS format so Import elements can extract characters,
@@ -17,7 +17,10 @@ description: >
   ad from a reference (see story-ad-from-reference).
 ---
 
-# Kirill's Cinema Studio scene workflow
+# Cinema Studio scene workflow
+
+Kirill's process for producing one AI video scene in Higgsfield Cinema Studio, extended with
+what running a whole piece through it taught us.
 
 Nine steps, in order. The order is the point: every step exists to stop a specific
 inconsistency from reaching the final generation, and skipping one shows up as a changed
