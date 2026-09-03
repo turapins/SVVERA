@@ -259,3 +259,107 @@ Practical reading: the more distinct camera positions a single generation asks f
 the location reference binds. If the room itself has to be recognisable — a product shot, a
 returning set across blocks — use fewer setups, or cut the scene into separate generations per
 angle and hold the room with `@LAST_FRAME`.
+
+---
+
+# Variant D — the difficulty is movement in depth, not the dialogue
+
+Fourth pair: 12 seconds, office corridor, four shots. A woman walks, nods to a passing
+colleague, is called from behind by her manager, stops, turns; he walks the distance to her
+and only then delivers the line. Two spoken sentences in the whole piece — everything hard
+about it is *staging*.
+
+## Block the three ways a model cheats an approach
+
+Models compress travel. Asked for "he walks up to her", they cut to him already there, or
+slide him in from the frame edge, or produce him out of a side door. This prompt names all
+three and refuses them, then repeats the refusal in a second section:
+
+```
+The MANAGER must first appear in the deep background directly behind her. He approaches
+her from behind by walking straight forward along the corridor.
+The MANAGER never enters through a side door, side corridor or edge of the frame. He never
+appears suddenly beside C1 and never teleports closer between shots.
+...
+Do not make the MANAGER appear suddenly beside C1. Do not bring him through a side doorway.
+Do not skip or conceal his approach.
+```
+
+It worked: at 0.3 seconds he is already a small figure in the centre of the corridor, and he
+covers the whole distance on camera across two shots. Positive description alone would not
+have done it — this is one of the places a named negative earns its space.
+
+## A cut condition, not only a cut time
+
+```
+Do not cut before the MANAGER has visibly crossed the distance and fully stopped.
+```
+
+The timecode says *when* the cut falls; this says *what must be finished* by then. Use the
+pair whenever a shot's length is doing narrative work rather than just filling time.
+
+## Split a line across shots and gate the second half on a physical event
+
+`"Sarah."` is called from several metres back while walking. `"You handled that well. Let's
+talk about that promotion."` comes only after he has stopped — stated three separate times
+(movement lock, shot 3, audio section). That is how a line lands *on* a blocking beat instead
+of floating anywhere in the shot.
+
+## An extra without a reference, defined by role and by exit
+
+```
+The PASSING EMPLOYEE is one unnamed adult office worker without a character reference. This
+person is a visually secondary background performer wearing ordinary neutral professional
+clothing. The employee has no dialogue, passes C1 only once and leaves before the
+conversation begins.
+...
+The PASSING EMPLOYEE is no longer visible and does not return.
+```
+
+A background human costs no element and adds no identity risk — provided the prompt says
+plainly that they are secondary, silent, and gone. The "does not return" line, placed in the
+next shot, is what stops them reappearing as a duplicate.
+
+## Spell a micro-interaction out as a checklist
+
+The nod between them is under a second and gets five constraints:
+
+```
+- one small nod from C1;
+- one restrained nod in response;
+- both continue walking;
+- no dialogue or handshake;
+- C1 keeps her right hand in her pocket.
+```
+
+"They nod at each other" becomes a conversation, a wave, or a stop. Any social beat that must
+stay small needs its ceiling written down.
+
+## One body detail doing three jobs
+
+The right hand in the pocket is introduced in shot 1, held explicitly through the nod, and
+then *removed* in shot 2 as the physical beat that carries the turn. Continuity anchor,
+characterisation, and beat change from a single detail — cheaper and more reliable than three
+separate instructions.
+
+## Restate the whole scene as an ordered list at the end
+
+Eight bullets replaying the beats in order, after they have already been written shot by
+shot. Same deliberate redundancy as the CAST MAP in the two-hander: the spatial progression is
+the thing most likely to collapse, so it is stated twice in two different shapes.
+
+## What drifted
+
+**The over-the-shoulder sides came back mirrored.** The prompt asked for C1's shoulder on the
+*right* edge in shot 3 and the manager's on the *left* in shot 4. The result put hers left and
+his right — the *relationship* is a correct corresponding reverse, only the absolute sides are
+flipped. Reading: `the physically corresponding reverse over-the-shoulder` is the instruction
+that carries weight; the named edge is not reliable. When a specific edge matters — matching a
+neighbouring block in the edit — verify it on the first frame and regenerate, rather than
+restating the sentence.
+
+**The prompt shipped with unfilled placeholders.** ROLE ASSIGNMENT still read
+`@[INSERT_FEMALE_C1_WORK_CHARACTER_TAG_HERE]` while ACTIVE REFERENCES carried the real tags.
+It survived because the real tags did the binding, but a bracketed placeholder is a live
+hazard: at best noise, at worst an invented character. Grep every prompt for `[` before
+generating.
