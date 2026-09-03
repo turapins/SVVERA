@@ -6,7 +6,9 @@ description: >
   locations and props; a project whose Project Brief holds every constant; character sheets
   and locations generated first and pinned as tagged Elements (@C1, @LOCATION); scene
   direction built with
-  CINEDANCE + ACTING SYSTEM + Lira, a short test generation before the full one, final
+  CINEDANCE + tig-acting-task + Lira, a script stress-tested with tig-scene-engine before
+  anything is generated, a tig-blocking-map diagram wherever staging past two characters
+  matters, a short test generation before the full one, final
   generation at 480p, and an optional ByteDance upscale to 1080p at the very end. Use this whenever
   a scene or dialogue video is being generated in Cinema Studio — "сделай сцену", "generate
   this scene", "нужен character sheet", "собери промт для сцены", "сгенерь по процессу
@@ -20,24 +22,51 @@ description: >
 # Cinema Studio scene workflow
 
 Kirill's process for producing one AI video scene in Higgsfield Cinema Studio, extended with
-what running a whole piece through it taught us.
+what running a whole piece through it taught us, and with the parts of Higgsfield's own feature
+pipeline that are better than what we had.
+
+**Read `references/oneiric-pipeline.md` before a project of any size.** It is the writeup of
+ONEIRIC, Higgsfield's own 20-minute generated short, published read-only inside Cinema Studio —
+the only first-party document of its kind. It is also where the `tig-scene-engine`,
+`tig-acting-task` and `tig-blocking-map` skills in this repo come from: they are the playbooks
+that film was made with, not third-party add-ons.
 
 Nine steps, in order. The order is the point: every step exists to stop a specific
 inconsistency from reaching the final generation, and skipping one shows up as a changed
 face, a changed room, or a broken screen axis three generations later.
 
 ```
-script in import format → project + brief → import elements
+stress-test the script (tig-scene-engine) → script in import format
+       → project + brief → import elements
        → [voice-over first, if VO-driven: measure real scene timings]
        → character sheets → locations → props → Elements check
-       → scene breakdown (CINEDANCE + ACTING + Lira) → group scenes into blocks
+       → scene breakdown (CINEDANCE + tig-acting-task + Lira)
+       → [blocking map, if 3+ characters or a previous take flipped a position]
+       → group scenes into blocks
        → plan review → short test → full 480p → [upscale 1080p]
 ```
 
 **Scope.** This skill covers one scene, from empty project to an approved 1080p file. It
 does not cut, join, caption or sound-design — approved scenes are handed to the edit.
 
-## 0. Write the script in the import format
+## 0a. Stress-test the script before anything is generated
+
+The cheapest step in the pipeline, and the one we did not have. Higgsfield's reason for it:
+
+> On an AI film a weak scene costs real money — you find out it doesn't work only after you've
+> generated it.
+
+Run every scene through **`tig-scene-engine`** — Goal, Obstacle, Tactic, Reversal, Value Shift,
+with bespoke definitions that are not the textbook ones. It returns a verdict per element, the
+single weakest point, and "what if" fixes from minimal to clean rewrite. A scene that fails the
+Reversal or Value Shift test will still generate beautifully and still not work, which is the
+most expensive way to find out.
+
+The same pass produces the **director's read**: the one shared event every character in the
+scene lives through, and each character's own physical channel for it. That read is what feeds
+the acting task in step 6.
+
+## 0b. Write the script in the import format
 
 Cinema Studio can read the script and pull characters, locations and props straight into
 Elements — **Import elements**, which accepts `.pdf`, `.xlsx`, `.csv`, `.docx`, `.txt` and
@@ -166,6 +195,30 @@ footwear, accessories, front and back view, and a close-up of the face.
 In Cinema Studio this is a two-node graph — a prompt node feeding an image-generation node
 that returns the three panels side by side.
 
+### Build the face and the wardrobe in two separate passes
+
+How ONEIRIC builds a character, and the rule we were missing:
+
+1. **The face first, always in close-up** — generated so the model captures identity at maximum
+   detail. That close-up is the anchor every other asset of the character is checked against.
+2. **Then the looks** — full-figure images with wardrobe, materials and silhouette, matched to
+   the locked face.
+3. Assemble the sheet around them, **with the original close-up preserved untouched. It never
+   runs through a model again.** Anything that changes between states — a scar, a haircut, dirt,
+   a wound, a new jacket — is integrated point by point with masks, around the base.
+
+> The base image stays the same pixels, so the identity (and the skin texture that carries it)
+> survives every new version of the character.
+
+Re-running a portrait through any model to make a variant is how a character quietly stops
+being the same person three scenes later.
+
+### A new state is a new asset, never an overwrite
+
+A character has as many assets as states he goes through — the same man in the kitchen and in a
+hospital bed are two assets, not one asset edited. The `_v<M>` suffix exists for exactly this.
+Never overwrite a locked reference to make a variant.
+
 ### Model choice: AI Cast, not Soul 2.0 — verified 2026-09-01
 
 Both accept a free-text prompt. The difference is what comes back:
@@ -269,6 +322,32 @@ Locations** model (in the model list under Cinematic models). Generating it empt
 object placement, lighting, colour palette, atmosphere, and the spatial geography that
 later shots have to respect.
 
+### Bake into the location asset anything the video model keeps dropping
+
+Higgsfield's anamorphic problem is our lens problem exactly: ask the video model for an optical
+character in the prompt and it drifts from shot to shot. Their fix generalises far past
+anamorphic —
+
+> The fix is to move the lens one step earlier in the pipeline: generate the location image with
+> the effect already in it. Seedance reads the optics straight off the asset and keeps them —
+> **the plate itself becomes the lens.**
+
+So: **a grade, a lens character, a texture, a time of day that the video model will not hold
+belongs in the location image, not in the video prompt.** We learned the inverse of this the
+hard way, when an evening prompt lost to a daylight kitchen reference — the reference wins, so
+put the thing you want inside the reference.
+
+Their optics block, appended to the *location image* prompt and dosed with
+subtle / gentle / moderate / strong / maximum:
+
+```
+STRONG anamorphic lens character: horizontal squeeze and compression, oval elliptical bokeh,
+horizontally stretched highlights, curved barrel edge distortion, chromatic aberration toward
+the edges. NO lens flares, NO light streaks, NO floating bokeh circles. 2.39:1.
+```
+
+Note where the bans sit: at the **image** stage only. See the rule on negatives at the end.
+
 ## 5. Add characters and location to Elements
 
 If the script was imported (step 0), the entries already exist with their names, tags and
@@ -322,11 +401,67 @@ the work:
 - **ACTING SYSTEM** (`acting-skill`) — the performance: objectives, obstacles, tactics,
   emotional beat changes, subtext, physical behaviour, pauses, reactions, eye movement,
   speech manner.
+- **`tig-acting-task`** — the same level, from the ONEIRIC pipeline, and the sharper tool for
+  writing the block that actually goes in the prompt. It replaces emotion labels with an acting
+  task and names the eye-work as action. `acting-skill` is the theory; this is the block format.
 - **Lira** (`lira-image-prompts`) — writes and repairs prompts for characters, locations,
   extra elements and first frames.
 
 The output is a detailed scene plan: shot sequence, character actions, dialogue, acting and
 camera work.
+
+### Give the eyes a job — never write the emotion
+
+> Write "sad" in a prompt and you get a caricature or a dead face. […] Dead, glassy eyes are
+> never fixed with lighting — they're fixed by giving the eyes a job.
+
+The ONEIRIC block form, short:
+
+```
+ACTING TASK — [NAME] (invested in his tactic; the work happens in his eyes):
+SCENE DIRECTION (shared, unspoken): [one line]
+MOTIVE / GOAL / OBSTACLE: [his fuel, his fight, what presses on it]
+TACTIC, moment to moment:
+— "[dialogue words]" — [verb at the partner + what the eyes check]
+(Safety: gaze always engaged in the task; natural blink cadence.)
+```
+
+The SCENE DIRECTION line is the director's read from step 0a — the one event all the characters
+share. Each character then gets his own motive and physical channel for it.
+
+### Staging: use a blocking map, not words, past two characters
+
+Our own record across three separate scenes (`references/dialogue-prompt.md`) is that a named
+screen side never carries — the shoulder edge comes back mirrored, or the backgrounds swap
+instead. Higgsfield reached the same conclusion and solved it properly:
+
+> When a shot needs precise multi-character staging — who is where in the frame, in what pose,
+> facing which way — words alone stop being enough. […] Win rate on staging-accurate takes goes
+> up dramatically.
+
+Use **`tig-blocking-map`**: a schematic colour-coded outline drawing attached alongside the real
+references, with a connector block binding each colour to a character tag. Reach for it whenever
+a shot has three or more people, or whenever a previous take flipped a position.
+
+Four things that make it work, all counter-intuitive enough to be worth repeating here: the
+diagram is a **front view from the camera's side, never a floor plan**; letters live in the
+prompt text only and never on the drawing; the connector never names the map's graphic style
+even as a ban; and the map is attached **last**, so the photo references win the style vote.
+Full method in the skill, background in `references/oneiric-pipeline.md`.
+
+### Add a GAZE / EYELINES block
+
+ONEIRIC's block order carries eyelines as their own section, before blocking:
+
+```
+SCENE CONTEXT · ACTIVE REFERENCES · LOCATION MAP · GAZE / EYELINES ·
+FIRST FRAME AND BLOCKING · SEGMENTS (timed beats) · DIALOGUE · AUDIO ·
+PHYSICS · LIGHTING · STYLE / FORMAT · POSITIVE LOCKS
+```
+
+They also split DIALOGUE from AUDIO, with AUDIO carrying voice identity only, and they repeat
+the LENS description **inside every segment** rather than once at the top — because every prompt
+is an island.
 
 ### CINEDANCE ships three reference files — open them, the head file is not enough
 
@@ -558,6 +693,10 @@ gets split at a cut, not stretched.
 
 ## Rules that carry the cost
 
+- Script stress-tested before a single generation — a weak scene generates beautifully and
+  still doesn't work.
+- Assets first: not one shot until every character, location and prop is named, versioned and
+  locked. A new state is a new asset, never an overwrite.
 - Script written in the import format, so Elements are extracted and not retyped.
 - Voice-over recorded and measured before any picture, on a VO-driven piece.
 - Scenes grouped into generations by location and cast, never by timeline position.
@@ -571,3 +710,22 @@ gets split at a cut, not stretched.
 - Check the first-frame still before generating video.
 - Test the hard fragment before the full length whenever the scene is non-trivial.
 - 480p until approved. **Upscale is optional and always last** — never to judge a take.
+- Every prompt is an island. "Same as the previous shot" is an instruction to a model that has
+  no "before" — positions, wardrobe, props, optics and light are spelled out from scratch, every
+  time, including inside each segment of a multi-shot prompt.
+- Anything the video model keeps dropping goes into the asset image instead of the prompt.
+- Staging past two characters goes in a blocking map, not in words.
+
+### Where a negative is allowed
+
+Higgsfield's iron rule is "say what you want, not what you avoid — the words you write are the
+words you summon, including the ones inside a 'no'". Our own results say naming a cheat is
+sometimes the only thing that works. Both hold, and the line is what to write down:
+
+| Kind of negative | Verdict |
+|---|---|
+| A renderable noun — *lens flare, grid, vector, flat illustration, letters, subtitles* | Never write it, not even as a ban. The token summons the thing. Ban it at the image stage only, if at all. |
+| A blocking or action cheat — *do not enter from a side door, do not skip his approach, do not replace the hand raise with a glance* | Works, and often nothing else does. It names a behaviour, not an object the model can draw. |
+
+And before strengthening any broken rule, look for the positive requirement that made breaking
+it unavoidable — see the "must remain visible" trap in `references/dialogue-prompt.md`.
