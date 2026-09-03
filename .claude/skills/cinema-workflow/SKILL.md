@@ -424,7 +424,14 @@ The prompt structure that comes out of this is fixed. Its sections, in order:
 `POSITIVE CONSTRAINTS`
 
 A complete worked 24-second two-character dialogue prompt is in
-`references/scene-prompt-template.md`. Copy its skeleton; `@` is always replaced by a
+`references/scene-prompt-template.md`.
+
+**For a scene with spoken dialogue, read `references/dialogue-prompt.md` as well.** A
+two-hander needs several sections a silent block never does — identity bound to visible
+anchors rather than tags alone, a speaker lock repeated inside every shot, a voice lock, a
+named physical continuity, and a closing identity lock. It also documents `@LAST_FRAME`
+chaining, which is how a conversation longer than the single-prompt maximum keeps continuity
+across generations. Copy its skeleton; `@` is always replaced by a
 location, character or prop tag.
 
 The scene also gets a **first frame** — a generated still of the opening blocking, which is
