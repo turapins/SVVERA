@@ -158,13 +158,25 @@ Soul 2.0 earns its place later, when a locked face has to appear across many gen
 
 ### Attaching Elements to a generation
 
-Use the **`+` beside `References`** in the settings row (typing `@` in the prompt opens the
-same picker). It has **Uploads / Elements / Generations / Liked** tabs; the **Elements** tab lists the project's own characters, locations and props
-with Characters / Locations / Props filters and the folder list. This is how identity gets
-into a generation — the prompt text alone does not bind an element.
+**Writing the exact element ID in the prompt attaches it automatically.** Paste a prompt
+containing `@char_ITM_mother-38_s1_v1` and the UI resolves the tag and pulls that element in
+by itself — the References counter fills without touching the picker. This is the fast path,
+and it is why tags must be copied verbatim from Elements: one wrong character resolves to
+nothing, silently.
 
-**Three layers, and all three are needed.** Attaching in the UI supplies the reference
-pixels. The `ACTIVE REFERENCES` block near the top of the prompt sets, per element, how
+The manual route stays for anything untagged — the **`+` beside `References`** (typing `@`
+opens the same picker), with **Uploads / Elements / Generations / Liked** tabs and
+Characters / Locations / Props filters.
+
+**Check the References counter before generating, either way.** It should equal the number of
+distinct elements named in the prompt; a run at `0/50` invents every character.
+
+**In the CLI none of this applies** — there are no project Elements, so tags bind to nothing.
+References go in as `--image-references` file paths and the prompt describes people instead
+of tagging them.
+
+**Three layers, and all three are needed.** The tag in the prompt supplies the reference
+pixels (or the UI attach, or `--image-references` in the CLI). The `ACTIVE REFERENCES` block near the top of the prompt sets, per element, how
 strictly to follow it ("100% matches the reference") and — critically for a location — which
 parts of it to use ("use for the bench, hedges, facade and daylight only"); without that
 scoping the model also inherits the reference's camera angle and composition and fights the
@@ -172,10 +184,9 @@ shot description. The inline tags inside each shot bind an element to what it ac
 Drop the attach and the model invents everyone; drop the block and the reference overreaches;
 drop the inline tags and it knows the cast but not the action.
 
-**Trap:** clicking the middle of an element tile opens a Status menu (In progress / Needs
-review / Approved) instead of selecting it, and the picker dismisses. Selection is on a
-different part of the tile — verify the `References` counter increments before generating.
-A generation that runs with `References 0/50` invents every character.
+**Trap in the manual picker:** clicking the middle of an element tile opens a Status menu
+(In progress / Needs review / Approved) instead of selecting it, and the picker dismisses.
+Prefer the tag route and avoid the picker.
 
 **Audio On or Off depends on the format, and it is not a rule.** The control sits in the
 settings row beside the duration.
