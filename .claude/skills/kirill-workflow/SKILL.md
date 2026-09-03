@@ -158,11 +158,16 @@ Soul 2.0 earns its place later, when a locked face has to appear across many gen
 
 ### Attaching Elements to a generation
 
-**Writing the exact element ID in the prompt attaches it automatically.** Paste a prompt
+**Pasting a prompt that contains exact element IDs attaches them automatically.** Paste text
 containing `@char_ITM_mother-38_s1_v1` and the UI resolves the tag and pulls that element in
 by itself — the References counter fills without touching the picker. This is the fast path,
 and it is why tags must be copied verbatim from Elements: one wrong character resolves to
 nothing, silently.
+
+**It has to be a real paste.** Typing the same characters keystroke by keystroke does not
+trigger the resolver — the identical prompt left `References 0/50` when typed and jumped to
+`5/50` when pasted. Automating this means putting the prompt on the system clipboard
+(`pbcopy < prompt.txt` on macOS) and sending `cmd+v`, not synthesising keystrokes.
 
 The manual route stays for anything untagged — the **`+` beside `References`** (typing `@`
 opens the same picker), with **Uploads / Elements / Generations / Liked** tabs and
