@@ -158,19 +158,35 @@ Soul 2.0 earns its place later, when a locked face has to appear across many gen
 
 ### Attaching Elements to a generation
 
-Type `@` in the prompt field. A picker opens with **Uploads / Elements / Generations /
-Liked** tabs; the **Elements** tab lists the project's own characters, locations and props
+Use the **`+` beside `References`** in the settings row (typing `@` in the prompt opens the
+same picker). It has **Uploads / Elements / Generations / Liked** tabs; the **Elements** tab lists the project's own characters, locations and props
 with Characters / Locations / Props filters and the folder list. This is how identity gets
 into a generation — the prompt text alone does not bind an element.
+
+**Three layers, and all three are needed.** Attaching in the UI supplies the reference
+pixels. The `ACTIVE REFERENCES` block near the top of the prompt sets, per element, how
+strictly to follow it ("100% matches the reference") and — critically for a location — which
+parts of it to use ("use for the bench, hedges, facade and daylight only"); without that
+scoping the model also inherits the reference's camera angle and composition and fights the
+shot description. The inline tags inside each shot bind an element to what it actually does.
+Drop the attach and the model invents everyone; drop the block and the reference overreaches;
+drop the inline tags and it knows the cast but not the action.
 
 **Trap:** clicking the middle of an element tile opens a Status menu (In progress / Needs
 review / Approved) instead of selecting it, and the picker dismisses. Selection is on a
 different part of the tile — verify the `References` counter increments before generating.
 A generation that runs with `References 0/50` invents every character.
 
-**Set audio to Off.** The control sits in the settings row beside the duration. Video models
-will otherwise synthesise a voice per clip, which is useless for a VO-driven piece and
-cannot be removed afterwards.
+**Audio On or Off depends on the format, and it is not a rule.** The control sits in the
+settings row beside the duration.
+
+- **Dialogue spoken on camera** — audio **On**. The model generates the speech and the mouth
+  movement together; Kirill's own two-hander example works this way.
+- **Voice-over laid on at the edit** — audio can go **Off**, since a per-clip synthesised
+  voice is unusable and cannot be stripped later. Leaving it On is also defensible: it costs
+  nothing and may return usable room tone. The one risk to watch is that the model sometimes
+  invents a line and animates lips to match it, which fights a "mouths stay closed"
+  constraint — if lips move in a silent shot, this is the first thing to check.
 
 ### UI traps in this form
 
