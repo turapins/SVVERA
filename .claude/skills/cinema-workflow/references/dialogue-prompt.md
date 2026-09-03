@@ -616,3 +616,86 @@ and never crosses the face, mouth or eyes. The boom arm enters from the lower fr
 Or drop the requirement: demand both props only in the two-shots, and let close-ups carry
 whatever falls naturally into frame. `Never crosses the face` on its own is not enough — it is
 a negative competing against a positive the model has no other way to satisfy.
+
+---
+
+# Variant G — one specific physical action, and two instructive failures
+
+Eighth video: 16 seconds, six shots, a classroom. A boy half-raises his hand to ask a question,
+sees nobody else has, and lowers it. The action is the whole creative — if the hand raise does
+not read, there is no scene.
+
+## MANDATORY ACTION LOCKS — the best-executed physical beat of any pair analysed
+
+```
+Ethan must visibly attempt to raise his LEFT HAND during Shot 3.
+His left palm must fully leave the desk.
+His left elbow and forearm must visibly rise.
+His left fingers must reach approximately shoulder height.
+The partially raised left hand must remain visible in the air for approximately half a
+second before lowering.
+The complete action must be visible in one uninterrupted shot: hand resting on desk →
+hand rising → brief hold → hand lowering back to desk.
+Do not replace the hand raise with a sideways glance, pencil movement, shoulder movement,
+hair adjustment or any other gesture.
+```
+
+Three things make this work, and they generalise to any action a scene depends on:
+
+1. **Decompose it into checkable sub-events.** Not "raises his hand" but palm leaves surface →
+   elbow lifts → forearm rises → fingers reach a named height → held for a named duration.
+   Each is separately verifiable in a frame.
+2. **Guarantee the framing.** `The entire rise, brief hold and lowering movement must remain
+   visible inside the frame. Do not crop Ethan's left elbow, forearm or hand.` An action the
+   frame crops did not happen.
+3. **Name the substitutions.** Models downgrade a specific gesture into a vaguer one — a glance,
+   a shrug, touching hair. Listing the likely substitutes blocks the downgrade.
+
+The result is unmistakable: palm off the desk, elbow up, forearm vertical, fingers above the
+shoulder. Copy this section shape whenever one physical beat carries the scene.
+
+## Failure 1 — positions were specified, orientation was not
+
+The boy sits *sideways to the whiteboard*. His desk, and several others, face across the room.
+
+The location map gives whiteboard on the front wall, windows along the left, door and podium
+front-right, `Ethan sits at an individual desk in the third row, slightly left of the central
+aisle`. Every one of those is a **position**. None is a **facing**. "Third row" and "central
+aisle" imply an orientation to a reader and imply nothing to the model.
+
+Always state facing separately from position:
+
+```
+Every desk faces the whiteboard on the front wall. Every seated student's shoulders are
+square to the front wall. Ethan's torso faces the whiteboard throughout; only his head and
+eyes turn toward the other students.
+```
+
+**And a positive requirement elsewhere made it worse.** Shot 3 asks for a *side* three-quarter
+angle in which `his face, shoulders, both arms, both hands, notebook and desktop remain clearly
+visible`. Showing a face and both hands from the side is far easier if the subject is turned
+sideways — so the visibility lock quietly rewrote the seating for the whole scene.
+
+This is the second confirmed instance of the same mechanism (see the microphone across the face
+in Variant F), so it is worth stating as a rule:
+
+> **A positive visibility requirement will rewrite staging to satisfy itself.** When a result
+> breaks a rule, look first for a "must remain visible / must stay in frame" line that cannot
+> be satisfied any other way. Strengthening the broken rule does nothing; the fix is to remove
+> the conflict — give the required element a position, or require it only in the shots where
+> the framing has room for it.
+
+## Failure 2 — the last shot on a long list is the one that gets dropped
+
+Shot 6 was a return to a wide showing the whole classroom, the teacher's neutral nod and the
+class resuming. What came back is a tight close-up of the boy, still talking. The entire closing
+beat is missing.
+
+Take A of the podcast lost shot 6 as well. Two of two long shot lists lost their final setup.
+Read across both: **a shot list longer than about five setups reliably loses its tail.** If the
+last shot carries meaning — a reveal, a closing wide, the beat that makes the scene land —
+generate it separately rather than as item six of six.
+
+Shot 3 also lost the background students the story needs (`several other students remain visible
+behind Ethan in soft focus, with all their hands down`) — the window filled the background
+instead, so the comparison that motivates him lowering his hand is never actually shown.
