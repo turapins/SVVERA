@@ -434,6 +434,15 @@ chaining, which is how a conversation longer than the single-prompt maximum keep
 across generations. Copy its skeleton; `@` is always replaced by a
 location, character or prop tag.
 
+That file now covers three proven patterns, analysed from Kirill's prompts against the
+videos they produced: a **two-hander** shot-reverse-shot; a **one-speaker scene with every
+other voice offscreen**, which avoids multi-character lip sync entirely and is the most
+reliable way to get dialogue density; and a **three-hander argument across four camera
+positions**, including the world-position-versus-screen-position clause that replaces the
+action-line rule when a scene genuinely needs reverse angles. It also records the cost:
+past three or four distinct camera setups in one generation, the location reference stops
+binding and the room drifts.
+
 The scene also gets a **first frame** — a generated still of the opening blocking, which is
 what `FIRST FRAME AND SPATIAL BLOCKING` describes. Check the still before generating video:
 if screen-left/screen-right is wrong there, it will be wrong in every shot.
