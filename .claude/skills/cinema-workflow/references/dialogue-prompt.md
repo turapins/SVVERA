@@ -589,3 +589,30 @@ the image was read as an identity and style seed rather than as a literal openin
 
 Practical: a starting frame is worth attaching, but do not spend a shot on holding it. Let
 shot 1 be real content and let the image do its work underneath.
+
+## A prop required to stay visible in a vertical close-up lands on the face
+
+In take B the host's boom arm runs diagonally across his cheek and chin, with the microphone
+ending in front of his chest — despite `the two boom arms ... never cross`.
+
+The cause is elsewhere in the prompt:
+
+```
+In close shots, the featured character's own microphone remains visible.
+```
+
+A 9:16 medium close-up has no lateral room. Asked to keep both a face and that face's own prop
+in frame, the model has one option left: overlap them. The visibility requirement produced the
+occlusion. Take A sat the microphone just under the chin instead — same bind, different roll.
+
+So in vertical, a prop that must stay in a close shot needs a **position relative to the face**,
+not just permission to be there:
+
+```
+In close shots the microphone stays in the lower third of the frame, below the chin line,
+and never crosses the face, mouth or eyes. The boom arm enters from the lower frame edge.
+```
+
+Or drop the requirement: demand both props only in the two-shots, and let close-ups carry
+whatever falls naturally into frame. `Never crosses the face` on its own is not enough — it is
+a negative competing against a positive the model has no other way to satisfy.
