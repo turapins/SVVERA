@@ -363,3 +363,121 @@ restating the sentence.
 It survived because the real tags did the binding, but a bracketed placeholder is a live
 hazard: at best noise, at worst an invented character. Grep every prompt for `[` before
 generating.
+
+---
+
+# Variant E — master, over, reverse: the standard coverage of a decision
+
+Fifth pair: 12 seconds, three shots, a manager telling an employee she did not get the
+promotion. Both characters speak. It is the plainest structure of the five — wide master,
+over-the-shoulder onto the speaker, reverse onto the listener — and it produced the cleanest
+result. Three setups instead of four also kept the room intact, unlike Variant C.
+
+## Give the silences a duration and a content
+
+Silence at the head:
+
+```
+For the first approximately 1.0 second, both characters remain silent with relaxed closed
+lips. The MANAGER maintains steady eye contact, preparing to deliver the difficult
+decision. C1 waits tensely and studies his face, already sensing that the news will be bad.
+```
+
+And at the tail, after the last word, a hold of 1.1-1.2 seconds with six things written into
+it:
+
+```
+- C1's lips close and remain still;
+- her gaze stays lowered toward the presentation folder;
+- she gives one almost imperceptible nod;
+- her shoulders remain slightly lowered;
+- one slow natural blink follows;
+- she does not recover, smile or restore her original professional posture.
+```
+
+This is the acting rule "a pause is legal only if something happens inside it" made
+executable. A hold without content comes back as a frozen face; a hold with six small events
+is the best two seconds in the scene. The `does not recover` line is what stops the model
+resetting the expression before the last frame.
+
+## Make a sentence atomic against the cut
+
+```
+Keep the camera in this wide master composition throughout the entire sentence.
+Do not cut during the sentence.
+Do not cut away before the word "anyone" has been spoken completely.
+```
+
+The cut is anchored to a **word**, not only to a timecode. Then on the far side of it:
+
+```
+The MANAGER continues the same conversation without restarting the previous sentence.
+Maintain the same male voice, volume, emotional state and speaking rhythm across the cut.
+The cut feels like continuous coverage of one uninterrupted conversation.
+```
+
+Restarting or re-saying a line after a hard cut is a standard failure — dialogue split across
+shots needs both halves of this: what must finish before the cut, and what must not restart
+after it.
+
+## Write emotion as vocal mechanics, not as an adjective
+
+```
+She says the first word directly on this disappointed exhale:
+C1: "Right."
+"Right" is soft, breath-led and slightly unsteady. It is not a neutral acknowledgment or
+calm agreement. The word sounds as though C1 is using the remaining breath to keep her
+disappointment under control.
+...
+"I understand" is controlled but noticeably subdued. Her voice has less support and volume
+than "Right".
+```
+
+Three mechanics — the word rides an exhale, breath is audible in it, and the second line is
+quantifiably weaker than the first. A stated *relative* dynamic between two lines is far more
+enforceable than "sad", which produces a performed sad face.
+
+## Define sympathy by the clichés it excludes
+
+```
+His sympathy appears through a slightly quieter delivery, restrained facial movement and
+steady eye contact. He does not perform an exaggerated sad expression, smile reassuringly
+or look away from C1.
+```
+
+Naming the three things a model reaches for when told "sympathetic" is what leaves room for
+the real thing.
+
+## Let the set carry the backstory
+
+```
+A closed laptop, a thin presentation folder, several printed pages and two water glasses
+remain in fixed positions on the desk, suggesting that an important meeting has just ended.
+The laptop is closed and the presentation pages lie untouched. The meeting has already
+ended. The room has become noticeably quiet.
+```
+
+Nobody has to say the meeting is over. Dressing is also continuity: the folder is what her
+gaze drops to in the final shot, so it had to exist in the location map.
+
+## Characters pinned as Elements survive across generations
+
+The manager arrives identical to his appearance in the corridor scene — same face, grey
+suit, burgundy tie, pocket square — in a completely separate generation. That is the return
+on pinning characters as Elements rather than describing them per prompt.
+
+## What drifted
+
+**The backgrounds swapped across the cuts.** The master establishes windows and skyline behind
+him, the office wall and entrance behind her. The over-the-shoulder then gives *him* a wall
+and a framed picture, and the reverse gives *her* the window blinds — precisely what
+`preserve matching eyelines and physically corresponding backgrounds across every cut` was
+written to prevent.
+
+Read this together with Variant D. There, the shoulder edges came back mirrored and nothing
+was said about backgrounds; here the shoulder edges were exactly as written and the
+backgrounds flipped instead. The model reliably produces *a* corresponding reverse; which
+axis of it matches the master — shoulder side, or what is behind each face — is not something
+the prompt has been able to control in either direction. Treat it as a check, not an
+instruction: look at the first frames of an OTS pair before paying for the full generation,
+and regenerate rather than rewording.
