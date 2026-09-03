@@ -290,6 +290,62 @@ the work:
 The output is a detailed scene plan: shot sequence, character actions, dialogue, acting and
 camera work.
 
+### CINEDANCE ships three reference files — open them, the head file is not enough
+
+`cinedance/SKILL.md` is the method; the control detail lives in files it tells you to read
+and which are easy to skip. Skipping them costs generations.
+
+| File | Open it when |
+|---|---|
+| `references/optics.md` | any lens choice — which is every scene with a person in it |
+| `references/blocking.md` | more than one subject, any multi-shot sequence, any scene with a screen axis |
+| `references/physics-lighting.md` | handheld camera, any specific lighting, liquids, weather, weapons, vehicles |
+
+What they add that the head file does not:
+
+- **Lens is a required section, and it is written in degrees.** Diagonal field of view plus
+  camera distance plus the visible optical outcome — `47°, camera 3 to 4 metres, natural
+  human-eye perspective`. Millimetres, f-stops, ISO and lens brand names are listed as
+  anti-patterns: the model reads outcomes, not metadata. Anchors are 8° · 18° · 29° · 47° ·
+  84° · 107°, chosen by content type — 47° for documentary-style action, 29° or 18° for
+  portraits and tight emotion, 84°–107° for environmental, 8° for distant observation.
+- **A multi-shot sequence needs a lens lock**, or the model re-picks a lens per shot and the
+  cuts refuse to match: `LENS IS 47° ACROSS ALL SHOTS. NOT NEGOTIABLE.` plus
+  `LENS LOCK SHOT n = 47°` on each shot header.
+- **Lighting needs the camera's side**, not just the source. Name the primary light, its
+  direction, which side of the subject falls into shadow, and what the exposure is set for.
+  Without it a described low key drifts to flat front light.
+- **Continuity across cuts is a written block**: same cast, geography, screen direction,
+  gaze targets, left/right, lighting direction, wardrobe and prop states — plus *action does
+  not reset after a cut*, which is what stops a character starting an action over again on
+  the other side of a hard cut.
+- **Proximity must be measurable.** "near", "beside", "behind him" are called out as weak;
+  use "within half a metre of the chair back", "hand on the handle".
+- **Cuts are named and effects forbidden**: HARD CUT / SMASH / MATCH / INSERT / REVERSE /
+  WHIP only, with no fade, crossfade or dissolve unless asked for.
+
+### What ACTING SYSTEM actually requires
+
+The performance layer is not mood adjectives. Every character in frame needs:
+
+- **An objective as a verb aimed at another person** — "make him explain the paper without
+  asking" — never a state like "be worried". Plus the obstacle and what failing costs.
+- **Two to four beat changes, each visible in the body**: a pause, a change of posture, a
+  tempo shift, a change of gaze. Behaviour unchanged for a whole shot reads as flat.
+- **Business** — hands doing a real task, and the *interrupted action* as punctuation: the
+  strongest accent in a scene is the moment a character stops what their hands were doing.
+- **Eye life, written explicitly.** Dead eyes are the number-one tell of AI acting:
+  micro-saccades, gaze targeting, realistic blink rate for the state, live catchlights, and
+  eyes reaching the target a beat before the head turns.
+- **The listener described too.** Reaction starts before the other person finishes; the
+  reaction shot is worth more than the action.
+- **States, not transitions** — write the character already mid-action, never the process of
+  getting there.
+
+In a silent piece this layer carries more weight, not less: with no dialogue, every beat has
+to be physical. Self-check against the skill's own scale and rewrite anything that lands
+below 4.
+
 Shared skills folder:
 https://drive.google.com/drive/folders/1b3ybyZE4TyX6xoPisdcyYvmLtfmkcBxK?usp=share_link
 
