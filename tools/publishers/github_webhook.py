@@ -50,7 +50,7 @@ class GithubWebhook(BaseTool):
         "Set GITHUB_TOKEN (repo + admin:repo_hook scopes) and "
         "GITHUB_WEBHOOK_SECRET in .env"
     )
-    resource_profile = ResourceProfile.MINIMAL
+    resource_profile = ResourceProfile(network_required=True)
     resume_support = ResumeSupport.NONE
 
     input_schema = {
@@ -74,14 +74,9 @@ class GithubWebhook(BaseTool):
     }
 
     def get_status(self) -> ToolStatus:
-        token = os.environ.get("GITHUB_TOKEN", "")
-        if not token:
-            return ToolStatus(
-                available=False,
-                message="GITHUB_TOKEN not set",
-                missing_deps=["env:GITHUB_TOKEN"],
-            )
-        return ToolStatus(available=True, message="GitHub token configured")
+        if os.environ.get("GITHUB_TOKEN"):
+            return ToolStatus.AVAILABLE
+        return ToolStatus.UNAVAILABLE
 
     def _headers(self) -> dict:
         token = os.environ.get("GITHUB_TOKEN", "")
