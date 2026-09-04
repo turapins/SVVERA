@@ -125,3 +125,7 @@ data/competitor_refs/
 # http.server refuses to start when --directory points at a missing path.
 /mockups/*
 !/mockups/.gitkeep
+
+# local env backups
+.env.save
+.env.*.bak
