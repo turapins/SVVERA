@@ -152,4 +152,8 @@ def test_registry_discovers_export_bundle():
     reg = ToolRegistry()
     reg.discover()
     assert reg.get("export_bundle") is not None
-    assert reg.get_by_capability("publish")[0].name == "export_bundle"
+    # Membership, not position: the publish capability gained siblings
+    # (clickup_notifier, github_webhook, frameio_*) and registry order is
+    # discovery order, not a contract.
+    publish_tools = {t.name for t in reg.get_by_capability("publish")}
+    assert "export_bundle" in publish_tools
