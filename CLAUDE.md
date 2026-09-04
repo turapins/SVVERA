@@ -46,38 +46,49 @@ Read [`context/scripts/`](context/scripts/) for winning and losing ad scripts wi
 
 ### Where skills live — and which copy to edit
 
-Four locations, four owners. Editing the wrong one loses the edit.
+Skills live in four places. Editing the wrong copy wastes the edit.
 
-| Location | Count | Owner | Edit it? |
-|---|---|---|---|
-| `.agents/skills/` | ~107 | mirror of upstream **calesthio/OpenMontage** | **No — read-only** |
-| `.claude/skills/` | ~75 | this project; **the copy Claude Code loads natively** | Yes |
-| `skills/` | 7 areas | SVVERA's own (`vocal-image`, `brand`, `creative`, `meta`, …) | Yes |
-| `~/.claude/skills/` | ~25 | vendor CLIs install here themselves | No — they overwrite it |
+| Location | Count | What it is |
+|---|---|---|
+| `.agents/skills/` | ~105 | **Mixed**: 89 mirrored from upstream calesthio/OpenMontage, 16 added by SVVERA |
+| `.claude/skills/` | ~75 | This project — **the copy Claude Code loads natively** |
+| `skills/` | 7 areas | SVVERA's own domain skills (`vocal-image`, `brand`, `creative`, `meta`, …) |
+| `~/.claude/skills/` | ~25 | Global, untracked — the HyperFrames family plus `watch` |
 
-`.agents/skills/` arrives through the upstream sync. An edit there is either
-reverted by the next sync or becomes a merge conflict, and pruning it guarantees
-conflicts. Treat it as a mirror: read it, copy from it, do not write to it.
+`.agents/skills/` is not a pure mirror, so "never touch it" would be wrong. Check
+which kind a skill is before editing:
 
-62 skills exist in **both** `.agents/skills/` and `.claude/skills/`. Since the
-agent loads the `.claude/` copy, a stale copy there is an instruction it follows
-rather than questions. On 2026-09-04 two had drifted with nothing surfacing it:
+```bash
+git cat-file -e calesthio/main:.agents/skills/<name> && echo upstream || echo ours
+```
+
+- **Upstream-mirrored** (`threejs-*`, `gsap-*`, `manim-*`, `remotion`, `ffmpeg`, …): do not
+  edit in place. The next sync overwrites the edit or turns it into a conflict.
+  Copy from it, don't write to it.
+- **SVVERA-added** (the whole `higgsfield-*` family, `hyperframes-audio`,
+  `hyperframes-keyframes`, `watch`, `mova`, `ad-creative`,
+  `competitor-profiling`, `marketing-psychology`, `character-sheet-production`,
+  `kling-motion-control`): these are ours and are vendored into **both**
+  `.agents/skills/` and `.claude/skills/`. A new SVVERA skill follows the same
+  pattern — add it to both.
+
+62 skills exist in both tracked directories. Since the agent loads the
+`.claude/` copy, a stale copy there is an instruction it follows rather than
+questions. On 2026-09-04 two had drifted with nothing surfacing it:
 `.claude/skills/elevenlabs` was four months behind and missing the whole
 provider-routing section (no `fal_elevenlabs_tts`, and it still implied asking
 the user for a `.env` key), and `.claude/skills/ai-video-gen` was missing the
 Kling Official path.
 
 `tests/contracts/test_skill_dir_parity.py` fails on any such drift and names the
-files. To resolve one, copy from the mirror:
+files. To resolve one, copy the newer side over the older:
 
 ```bash
 rm -rf .claude/skills/<name> && cp -r .agents/skills/<name> .claude/skills/<name>
 ```
 
-Leave `~/.claude/skills/` alone. The installers recreate what they ship on every
-update — the higgsfield CLI 1.1.24 added `higgsfield-brandkit` and
-`higgsfield-youtube-thumbnail` that way — so deleting those is a fight you lose
-repeatedly.
+Leave `~/.claude/skills/` alone — it is installed and refreshed by tooling
+outside this repo.
 
 ### Verifying Python changes
 
