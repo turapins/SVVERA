@@ -28,6 +28,9 @@ tests/qa/output/
 # Project workspaces (generated assets, renders — all regenerable)
 projects/
 
+# Daily competitor-creative collection (regenerable from Atria API)
+data/competitor_refs/
+
 # Corpus directories (downloaded stock clips, thumbnails, embeddings —
 # regenerable from source APIs via corpus_builder). Explicit rule even
 # though most corpora live under projects/ since agents sometimes
@@ -96,3 +99,6 @@ remotion-composer/public/demo-props/talking-head-*
 remotion-composer/public/demo-props/caption-burn-*
 
 venv/
+# local env backups
+.env.save
+.env.*.bak
