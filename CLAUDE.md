@@ -44,6 +44,41 @@ Read [`context/scripts/`](context/scripts/) for winning and losing ad scripts wi
   - `pinterest_reference` (real API) — searches/reads only Ivan's **own already-saved** pins/boards, not the public platform. Useful for re-finding something already pinned, not for discovery.
   - One-time setup: create an app at developers.pinterest.com, set `PINTEREST_APP_ID`/`PINTEREST_APP_SECRET` in `.env`, run `python3 scripts/pinterest_auth.py` once.
 
+### Where skills live — and which copy to edit
+
+Four locations, four owners. Editing the wrong one loses the edit.
+
+| Location | Count | Owner | Edit it? |
+|---|---|---|---|
+| `.agents/skills/` | ~107 | mirror of upstream **calesthio/OpenMontage** | **No — read-only** |
+| `.claude/skills/` | ~75 | this project; **the copy Claude Code loads natively** | Yes |
+| `skills/` | 7 areas | SVVERA's own (`vocal-image`, `brand`, `creative`, `meta`, …) | Yes |
+| `~/.claude/skills/` | ~25 | vendor CLIs install here themselves | No — they overwrite it |
+
+`.agents/skills/` arrives through the upstream sync. An edit there is either
+reverted by the next sync or becomes a merge conflict, and pruning it guarantees
+conflicts. Treat it as a mirror: read it, copy from it, do not write to it.
+
+62 skills exist in **both** `.agents/skills/` and `.claude/skills/`. Since the
+agent loads the `.claude/` copy, a stale copy there is an instruction it follows
+rather than questions. On 2026-09-04 two had drifted with nothing surfacing it:
+`.claude/skills/elevenlabs` was four months behind and missing the whole
+provider-routing section (no `fal_elevenlabs_tts`, and it still implied asking
+the user for a `.env` key), and `.claude/skills/ai-video-gen` was missing the
+Kling Official path.
+
+`tests/contracts/test_skill_dir_parity.py` fails on any such drift and names the
+files. To resolve one, copy from the mirror:
+
+```bash
+rm -rf .claude/skills/<name> && cp -r .agents/skills/<name> .claude/skills/<name>
+```
+
+Leave `~/.claude/skills/` alone. The installers recreate what they ship on every
+update — the higgsfield CLI 1.1.24 added `higgsfield-brandkit` and
+`higgsfield-youtube-thumbnail` that way — so deleting those is a fight you lose
+repeatedly.
+
 ### Verifying Python changes
 
 Run the suite through make, not bare pytest:
