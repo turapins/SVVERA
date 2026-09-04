@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from lib.checkpoint import PROJECTS_DIR, init_project, write_checkpoint
 from lib.events import emit_event
+from tests.contracts.test_phase0_contracts import sample_artifact
 
 SCENES = [
     ("sc1", "Opening — a lighthouse at dusk", 0, 4, "The coast holds its breath."),
@@ -89,10 +90,50 @@ def main() -> int:
 
     # research auto-proceeds (schema-valid fixture from the contract tests)
     cp("research", "in_progress", {})
-    from tests.contracts.test_phase0_contracts import sample_artifact
     brief = sample_artifact("research_brief")
     brief["topic"] = "The Last Lighthouse"
     cp("research", "completed", {"research_brief": brief})
+
+    # proposal gates: the manifest marks it human_approval_default: true, and
+    # script lists proposal_packet as a required input — so it cannot be
+    # skipped without tripping the prerequisite check.
+    cp("proposal", "in_progress", {})
+    packet = sample_artifact("proposal_packet")
+    decisions = {
+        "version": "1.0",
+        "project_id": pid,
+        "decisions": [
+            {"decision_id": "d1", "stage": "proposal", "category": "concept_selection",
+             "subject": "Emotional arc",
+             "options_considered": [
+                 {"option_id": "o1", "label": "Slow burn", "score": 0.9,
+                  "reason": "Earns the blackout by establishing the beam first."},
+                 {"option_id": "o2", "label": "Cold open", "score": 0.5,
+                  "reason": "Punchy, but spends the reveal in the first second.",
+                  "rejected_because": "Nothing left to escalate to."},
+                 {"option_id": "o3", "label": "Montage", "score": 0.3,
+                  "reason": "No single beat lands at 21 seconds.",
+                  "rejected_because": "Too short a runtime to accumulate."},
+             ],
+             "selected": "o1", "reason": "The reveal only lands if the beam is established first.",
+             "user_visible": True, "user_approved": True},
+            {"decision_id": "d2", "stage": "proposal", "category": "music_source",
+             "subject": "Score",
+             "options_considered": [
+                 {"option_id": "m1", "label": "Generated cue", "score": 0.8,
+                  "reason": "Can be written to the exact 21-second cut."},
+                 {"option_id": "m2", "label": "Licensed track", "score": 0.4,
+                  "reason": "Catalogue minimum is 30 seconds.",
+                  "rejected_because": "Would need a mid-phrase fade."},
+             ],
+             "selected": "m1", "reason": "No licensed cue matches a 21-second cut.",
+             "user_visible": True, "user_approved": True},
+        ],
+    }
+    cp("proposal", "awaiting_human", {"proposal_packet": packet, "decision_log": decisions})
+    time.sleep(wait)
+    cp("proposal", "completed", {"proposal_packet": packet, "decision_log": decisions},
+       human_approved=True)
 
     # script gates: awaiting_human -> approved
     cp("script", "in_progress", {})
@@ -149,6 +190,47 @@ def main() -> int:
                       "budget_remaining_usd": 5 - manifest["total_cost_usd"]})
     time.sleep(wait)
     cp("assets", "completed", {"asset_manifest": manifest}, human_approved=True)
+
+    # edit and compose auto-proceed; publish gates.
+    cp("edit", "in_progress", {})
+    edl = sample_artifact("edit_decisions")
+    cp("edit", "completed", {"edit_decisions": edl})
+
+    cp("compose", "in_progress", {})
+    render_rel = "renders/the-last-lighthouse.mp4"
+    (pdir / "renders").mkdir(parents=True, exist_ok=True)
+    report = sample_artifact("render_report")
+    report["outputs"][0]["path"] = render_rel
+    report["outputs"][0]["duration_seconds"] = 21
+    final_review = {
+        "version": "1.0",
+        "output_path": render_rel,
+        "status": "pass",
+        "checks": {
+            "technical_probe": {"valid_container": True, "duration_seconds": 21,
+                                "resolution": "1920x1080", "fps": 30, "has_audio": True,
+                                "codec": "h264", "issues": []},
+            "visual_spotcheck": {"frames_sampled": 4, "black_frames_detected": False,
+                                 "broken_overlays": False, "missing_assets": False,
+                                 "unreadable_text": False, "issues": []},
+            "audio_spotcheck": {"narration_present": True, "music_present": True,
+                                "unexpected_silence": False, "clipping_detected": False,
+                                "mix_intelligible": True, "issues": []},
+            "promise_preservation": {"delivery_promise_honored": True,
+                                     "silent_downgrade_detected": False, "issues": []},
+            "subtitle_check": {"subtitles_expected": False, "subtitles_present": False,
+                               "issues": []},
+        },
+        "issues_found": [],
+        "recommended_action": "present_to_user",
+    }
+    cp("compose", "completed", {"render_report": report, "final_review": final_review})
+
+    cp("publish", "in_progress", {})
+    log = sample_artifact("publish_log")
+    cp("publish", "awaiting_human", {"publish_log": log})
+    time.sleep(wait)
+    cp("publish", "completed", {"publish_log": log}, human_approved=True)
 
     print(f"[sim] done — board at http://127.0.0.1:4750/p/{pid}")
     if args.cleanup:
