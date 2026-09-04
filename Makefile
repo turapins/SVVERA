@@ -6,7 +6,7 @@ PIP = $(RUN_PYTHON) -m pip
 
 .DEFAULT_GOAL := setup
 
-.PHONY: setup install install-dev install-gpu test test-contracts lint clean preflight demo demo-list hyperframes-doctor hyperframes-warm venv ensure-venv
+.PHONY: setup install install-dev install-gpu test test-contracts lint clean preflight demo demo-list hyperframes-doctor hyperframes-warm venv ensure-venv ensure-test-deps
 
 # ---- Virtual environment ----
 
@@ -89,10 +89,20 @@ install-gpu: ensure-venv
 
 # ---- Testing ----
 
-test: ensure-venv
+# ensure-venv provisions the interpreter but installs nothing, so `make test`
+# on a fresh checkout used to die with "No module named pytest" — CI only
+# worked because it runs `make install-dev` first. Install the dev extras when,
+# and only when, pytest is actually missing; in CI this is a no-op.
+ensure-test-deps: ensure-venv
+	@$(RUN_PYTHON) -c "import pytest" >/dev/null 2>&1 || { \
+		echo "==> pytest missing; installing dev dependencies"; \
+		$(PIP) install -q -r requirements-dev.txt; \
+	}
+
+test: ensure-test-deps
 	$(RUN_PYTHON) -m pytest tests/ -v
 
-test-contracts: ensure-venv
+test-contracts: ensure-test-deps
 	$(RUN_PYTHON) -m pytest tests/contracts/ -v
 
 # ---- Utilities ----
