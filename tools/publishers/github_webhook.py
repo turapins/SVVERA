@@ -50,7 +50,7 @@ class GithubWebhook(BaseTool):
         "Set GITHUB_TOKEN (repo + admin:repo_hook scopes) and "
         "GITHUB_WEBHOOK_SECRET in .env"
     )
-    resource_profile = ResourceProfile.MINIMAL
+    resource_profile = ResourceProfile(network_required=True)
     resume_support = ResumeSupport.NONE
 
     input_schema = {
