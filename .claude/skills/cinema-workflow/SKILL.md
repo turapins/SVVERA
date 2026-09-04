@@ -6,7 +6,9 @@ description: >
   locations and props; a project whose Project Brief holds every constant; character sheets
   and locations generated first and pinned as tagged Elements (@C1, @LOCATION); scene
   direction built with
-  CINEDANCE + ACTING SYSTEM + Lira, a short test generation before the full one, final
+  CINEDANCE + tig-acting-task + Lira, a script stress-tested with tig-scene-engine before
+  anything is generated, a tig-blocking-map diagram wherever staging past two characters
+  matters, a short test generation before the full one, final
   generation at 480p, and an optional ByteDance upscale to 1080p at the very end. Use this whenever
   a scene or dialogue video is being generated in Cinema Studio — "сделай сцену", "generate
   this scene", "нужен character sheet", "собери промт для сцены", "сгенерь по процессу
@@ -20,24 +22,61 @@ description: >
 # Cinema Studio scene workflow
 
 Kirill's process for producing one AI video scene in Higgsfield Cinema Studio, extended with
-what running a whole piece through it taught us.
+what running a whole piece through it taught us, and with the parts of Higgsfield's own feature
+pipeline that are better than what we had.
+
+**Read the two first-party pipeline files before a project of any size.** Higgsfield Studio
+publishes full production briefs for its own generated films, and they are the only documents of
+their kind:
+
+| File | Source | Read it for |
+|---|---|---|
+| `references/oneiric-pipeline.md` | ONEIRIC (20 min) + ADILIADA (6 min) | the short-form pipeline, the two-pass character sheet, the blocking diagram, the depth map |
+| `references/cully-hill-pipeline.md` | THE CULLY HILL BOYS (1h54m, 137 scenes, 473k generations) | everything operational — sheet construction, the video stress test, location kits, the master shot and spatial map, optics anchors, named locks, production discipline, music lip-sync |
+| `references/hell-grind-pipeline.md` | HELL GRIND (95 min, 15 people, 14 days of generation, Cannes) | the origin brief — prompt length and the per-beat limit, naming the role of every reference, the age ban, the Style Prefix, how a dialogue line is built, scale anchors |
+
+ONEIRIC is also where the `tig-scene-engine`, `tig-acting-task` and `tig-blocking-map` skills in
+this repo come from: they are the playbooks those films were made with, not third-party add-ons.
+
+Where the briefs repeat each other, treat it as settled practice. Where Cully Hill is more
+specific, it is later and it wins.
 
 Nine steps, in order. The order is the point: every step exists to stop a specific
 inconsistency from reaching the final generation, and skipping one shows up as a changed
 face, a changed room, or a broken screen axis three generations later.
 
 ```
-script in import format → project + brief → import elements
+stress-test the script (tig-scene-engine) → script in import format
+       → project + brief → import elements
        → [voice-over first, if VO-driven: measure real scene timings]
        → character sheets → locations → props → Elements check
-       → scene breakdown (CINEDANCE + ACTING + Lira) → group scenes into blocks
+       → scene breakdown (CINEDANCE + tig-acting-task + Lira)
+       → [blocking map, if 3+ characters or a previous take flipped a position]
+       → group scenes into blocks
        → plan review → short test → full 480p → [upscale 1080p]
 ```
 
 **Scope.** This skill covers one scene, from empty project to an approved 1080p file. It
 does not cut, join, caption or sound-design — approved scenes are handed to the edit.
 
-## 0. Write the script in the import format
+## 0a. Stress-test the script before anything is generated
+
+The cheapest step in the pipeline, and the one we did not have. Higgsfield's reason for it:
+
+> On an AI film a weak scene costs real money — you find out it doesn't work only after you've
+> generated it.
+
+Run every scene through **`tig-scene-engine`** — Goal, Obstacle, Tactic, Reversal, Value Shift,
+with bespoke definitions that are not the textbook ones. It returns a verdict per element, the
+single weakest point, and "what if" fixes from minimal to clean rewrite. A scene that fails the
+Reversal or Value Shift test will still generate beautifully and still not work, which is the
+most expensive way to find out.
+
+The same pass produces the **director's read**: the one shared event every character in the
+scene lives through, and each character's own physical channel for it. That read is what feeds
+the acting task in step 6.
+
+## 0b. Write the script in the import format
 
 Cinema Studio can read the script and pull characters, locations and props straight into
 Elements — **Import elements**, which accepts `.pdf`, `.xlsx`, `.csv`, `.docx`, `.txt` and
@@ -106,6 +145,20 @@ camera language, the casting rules, the model and resolution, the project's own 
 Anything that lands there is not retyped into prompts — and a prompt restating the palette or
 the camera rules is a sign the brief is not being used.
 
+### Two project constants that live next to the brief
+
+Both are pasted into every prompt word for word, and both exist so that one edit updates every
+shot at once:
+
+- **A Style Prefix** — one block covering style, cinematography, lighting, the colour ratio,
+  camera, skin, acting, physics, composition, continuity, technical and audio, closed with the
+  technical tags (`Photoreal. NON-IP. <aspect>. <duration>s. SFX only. NO CGI. Cinematic.`).
+  `SFX only. No music.` is mandatory in it: a generated soundtrack only fights the edit, and
+  continuous ambience laid in post is what glues generated shots into one space.
+- **A ban dictionary** — words this project has caught the model punishing, with their
+  replacements: *dark* → *low key*, *jolting* → *rapid motion*. Add to it whenever a word
+  demonstrably drags a generation somewhere unwanted.
+
 Three layers, and a fact belongs to exactly one:
 
 | Where | What it holds |
@@ -165,6 +218,85 @@ footwear, accessories, front and back view, and a close-up of the face.
 
 In Cinema Studio this is a two-node graph — a prompt node feeding an image-generation node
 that returns the three panels side by side.
+
+### Build the face and the wardrobe in two separate passes
+
+How ONEIRIC builds a character, and the rule we were missing:
+
+1. **The face first, always in close-up** — generated so the model captures identity at maximum
+   detail. That close-up is the anchor every other asset of the character is checked against.
+2. **Then the looks** — full-figure images with wardrobe, materials and silhouette, matched to
+   the locked face.
+3. Assemble the sheet around them, **with the original close-up preserved untouched. It never
+   runs through a model again.** Anything that changes between states — a scar, a haircut, dirt,
+   a wound, a new jacket — is integrated point by point with masks, around the base.
+
+> The base image stays the same pixels, so the identity (and the skin texture that carries it)
+> survives every new version of the character.
+
+Re-running a portrait through any model to make a variant is how a character quietly stops
+being the same person three scenes later. ADILIADA states the extreme form of the rule: a new
+universe is a new look, not a new person — even a character playing his own villain version is
+the same face pixels in different wardrobe.
+
+### Sheet construction rules that cost generations when skipped
+
+From the feature brief, all of them the result of a shot failing:
+
+- **Take the head off the full-body panels.** On a wide panel the face is small and soft, and
+  that is exactly the face the model copies into a wide shot. Remove it and the close portrait
+  becomes the only source of the face.
+- **The close portrait is three-quarter**, so the model gets front and side at once.
+- **Make two close-ups, smiling and not.** Otherwise the model invents the teeth and the jaw the
+  first time the character laughs, and the smile arrives as someone else's mouth. Do this for
+  every speaking character.
+- **Never write "studio".** It draws an actual photo studio — stands, lights — into the frame,
+  and bakes a studio key that then repeats in every video generation. Write `no studio, no
+  equipment, no walls`. `Overhead key light` draws the lamp itself.
+- **Rim light is banned.** A sheet with a beautiful edge glow drags that light into every scene
+  and stops reacting to the real one.
+- **Hands stay empty on the sheet.** Every object is its own asset — a prop born inside a sheet
+  can never be dropped, thrown or taken away.
+
+### Keep the sheet boring on purpose
+
+The counterpoint to baking the look into the location plate:
+
+> The cinema look does not live in the character sheet — it lives in the locations and in the
+> video prompts.
+
+Neutral grey, flat light, real skin with visible pores, no retouch. Bake film grain or a
+cinematic lens into a sheet and the character carries that look into every scene and **stops
+reacting to new light**. So: the look goes into the plate, never into the person.
+
+When the model returns several versions of a face, **pick the most believable, not the most
+beautiful** — a beautiful-but-fake face shows its fakeness later in video, when it is too late.
+And check the eyes: even dark ones need a catch-light in the pupil, or the face reads dead and
+no video model can act with it.
+
+The reason the base is never re-run, stated properly: every extra pass destroys texture and
+drifts colour, and after two passes a face turns symmetrical, plastic and lifeless — which then
+shows up as bad acting in video.
+
+### Stress-test the sheet with video, not with your eyes
+
+A sheet that looks perfect proves nothing. Ten generations — different actions, shot sizes and
+locations — and the character must be recognisable in ten out of ten. Run them as real prompts:
+running, on the phone, crying, laughing, shouting. That is how you find out a face is only
+stable while the character is calm.
+
+Two conditions: **test the character and the location together** (the assets pull on each other,
+so never test a hero before his location exists) and **test him in a two-shot**, because a hero
+who holds up alone often breaks beside someone.
+
+And when it falls apart, suspect the asset, not only the prompt. Fix the words first; if the
+same thing breaks again, rebuild the sheet.
+
+### A new state is a new asset, never an overwrite
+
+A character has as many assets as states he goes through — the same man in the kitchen and in a
+hospital bed are two assets, not one asset edited. The `_v<M>` suffix exists for exactly this.
+Never overwrite a locked reference to make a variant.
 
 ### Model choice: AI Cast, not Soul 2.0 — verified 2026-09-01
 
@@ -269,6 +401,58 @@ Locations** model (in the model list under Cinematic models). Generating it empt
 object placement, lighting, colour palette, atmosphere, and the spatial geography that
 later shots have to respect.
 
+### Generate the plate in three-quarter, and leave an anchor in it
+
+Two location rules that both feature briefs state independently:
+
+- **Wide or medium in three-quarter view, never frontal.** A frontal picture of a room is flat
+  wallpaper — the model cannot read volume from it and invents new surroundings past the frame
+  edges every time. Three-quarter gives depth and yields almost a full circle of angles from one
+  plate.
+- **Leave a visual anchor** — a column, a lamp, a sofa, a crooked chair — and tie all staging to
+  it. "The hero at the lamp, facing the door" works; "the hero in the room" is a lottery. This is
+  the single cheapest thing that stops characters wandering between takes.
+
+Also: one light logic, one direction of shadows, never two suns. No people and no weapons in the
+plate. Against the render look, write real surfaces — rust, cracks, tape, fingerprints, oil
+stains, water marks.
+
+**A dialogue location needs a kit, not a plate**: three-quarter, front, reverse, and a background
+plate for each character in the scene. Build it from the one plate by generating a video of the
+empty room with the camera walking slowly through it — the model draws the other sides
+consistently with your plate — then screenshot the angle you need and clean its texture and
+light in an image model. A pass-through location needs one angle.
+
+Once the whole set exists, run a **unification pass** over it for colour, light and saturation,
+so the plates match in character before any generation. Cheaper than finding the mismatch in the
+grade.
+
+### Bake into the location asset anything the video model keeps dropping
+
+Higgsfield's anamorphic problem is our lens problem exactly: ask the video model for an optical
+character in the prompt and it drifts from shot to shot. Their fix generalises far past
+anamorphic —
+
+> The fix is to move the lens one step earlier in the pipeline: generate the location image with
+> the effect already in it. Seedance reads the optics straight off the asset and keeps them —
+> **the plate itself becomes the lens.**
+
+So: **a grade, a lens character, a texture, a time of day that the video model will not hold
+belongs in the location image, not in the video prompt.** We learned the inverse of this the
+hard way, when an evening prompt lost to a daylight kitchen reference — the reference wins, so
+put the thing you want inside the reference.
+
+Their optics block, appended to the *location image* prompt and dosed with
+subtle / gentle / moderate / strong / maximum:
+
+```
+STRONG anamorphic lens character: horizontal squeeze and compression, oval elliptical bokeh,
+horizontally stretched highlights, curved barrel edge distortion, chromatic aberration toward
+the edges. NO lens flares, NO light streaks, NO floating bokeh circles. 2.39:1.
+```
+
+Note where the bans sit: at the **image** stage only. See the rule on negatives at the end.
+
 ## 5. Add characters and location to Elements
 
 If the script was imported (step 0), the entries already exist with their names, tags and
@@ -322,11 +506,182 @@ the work:
 - **ACTING SYSTEM** (`acting-skill`) — the performance: objectives, obstacles, tactics,
   emotional beat changes, subtext, physical behaviour, pauses, reactions, eye movement,
   speech manner.
+- **`tig-acting-task`** — the same level, from the ONEIRIC pipeline, and the sharper tool for
+  writing the block that actually goes in the prompt. It replaces emotion labels with an acting
+  task and names the eye-work as action. `acting-skill` is the theory; this is the block format.
 - **Lira** (`lira-image-prompts`) — writes and repairs prompts for characters, locations,
   extra elements and first frames.
 
 The output is a detailed scene plan: shot sequence, character actions, dialogue, acting and
 camera work.
+
+### Give the eyes a job — never write the emotion
+
+> Write "sad" in a prompt and you get a caricature or a dead face. […] Dead, glassy eyes are
+> never fixed with lighting — they're fixed by giving the eyes a job.
+
+The ONEIRIC block form, short:
+
+```
+ACTING TASK — [NAME] (invested in his tactic; the work happens in his eyes):
+SCENE DIRECTION (shared, unspoken): [one line]
+MOTIVE / GOAL / OBSTACLE: [his fuel, his fight, what presses on it]
+TACTIC, moment to moment:
+— "[dialogue words]" — [verb at the partner + what the eyes check]
+(Safety: gaze always engaged in the task; natural blink cadence.)
+```
+
+The SCENE DIRECTION line is the director's read from step 0a — the one event all the characters
+share. Each character then gets his own motive and physical channel for it.
+
+### Staging: use a blocking map, not words, past two characters
+
+Our own record across three separate scenes (`references/dialogue-prompt.md`) is that a named
+screen side never carries — the shoulder edge comes back mirrored, or the backgrounds swap
+instead. Higgsfield reached the same conclusion and solved it properly:
+
+> When a shot needs precise multi-character staging — who is where in the frame, in what pose,
+> facing which way — words alone stop being enough. […] Win rate on staging-accurate takes goes
+> up dramatically.
+
+Use **`tig-blocking-map`**: a schematic colour-coded outline drawing attached alongside the real
+references, with a connector block binding each colour to a character tag. Reach for it whenever
+a shot has three or more people, or whenever a previous take flipped a position.
+
+Four things that make it work, all counter-intuitive enough to be worth repeating here: the
+diagram is a **front view from the camera's side, never a floor plan**; letters live in the
+prompt text only and never on the drawing; the connector never names the map's graphic style
+even as a ban; and the map is attached **last**, so the photo references win the style vote.
+Full method in the skill, background in `references/oneiric-pipeline.md`.
+
+### Open every scene with a master shot, then paste a spatial map into every prompt
+
+The feature brief's answer to positions not holding — and the one we should adopt first, because
+it costs almost nothing.
+
+**A master shot**: a wide with fixed blocking, about a second long, no lines and no action. The
+model photographs the arrangement — who is where, what lies where, where the light comes from —
+and holds it through the following shots. Remove that second and the characters start swapping
+places. Two hacks on it: let someone say one short word ("hm") and the model treats the wide as
+a proper shot more readily; and if the scene answers a previous one, feed the tail of the
+previous clip's line into that first second, so the performance answers the right thing and the
+two clips glue at the seam.
+
+**A spatial map** — a compass written once per scene and pasted into every shot of that scene
+unchanged. It names the camera side and the line never crossed, puts the landmarks in frame
+terms, ties each character to a landmark, and states the exact head count.
+
+The rules that make it work are the ones we got wrong all session:
+
+- **Positions come from what is visible in the plate, not from measurements.** Metres mean
+  nothing to the model, and "to the left of the hero" means less than nothing, because it does
+  not know where the hero is. Tie every body to something it can see — the lamp, the second chair
+  row, the stage edge, the door — and use **frame-left / frame-right** for sides.
+- **After every cut, name again who is where and where they look.**
+- **Give a static dialogue a corner of the room, not the whole room** — less space, less choice.
+- **When a generation contradicts the real location, re-read the reference, not the prompt.**
+
+### Two non-textual controls: the blocking diagram and the depth map
+
+They solve different problems and can be used together:
+
+| Control | Fixes | Use when |
+|---|---|---|
+| Blocking diagram (`tig-blocking-map`) | who is where in the frame, facing which way | three or more characters, or a previous take flipped a position |
+| Depth map — black-and-white, light = near, dark = far | how deep the room is and where bodies sit in that depth | real foreground/background separation to hold, or a space that keeps reshaping between takes |
+
+### Optics: ten anchors, and a native zone
+
+Degrees, never millimetres: **180 · 135 · 107 · 84 · 63 · 47 · 29 · 18 · 12 · 8**. The native
+zone is **29–84°** and comes out reliably; outside it the risk starts. Three laws:
+
+- **Content decides the lens.** The model does not obey the number — it infers the lens from
+  what is in the frame, which is why fine detail on 135° collapses and a crowd on 8° collapses.
+- **One lens per shot, declared**, or it slides to a comfortable middle — write it as a
+  per-shot list with FOV changing only on the hard cuts.
+- **A long lens needs its whole observation pattern** or it snaps back to normal: the degrees,
+  the camera distance in metres, the background compressed to a colour wash, and mandatory
+  foreground occlusion filling the lower third to half of frame.
+
+### Never write an age, in any language
+
+> The content filter becomes much stricter the moment it reads a minor; instead of age, give the
+> role, the clothes, the action.
+
+We lost generations to exactly this. No ages anywhere in a prompt or a sheet description — a
+young character is described by role, wardrobe and behaviour.
+
+### How long a prompt should be
+
+Their feature prompts ran **3,000–4,000 words**, and the constraint is not length:
+
+> Length is not the enemy; an overloaded beat is.
+
+**Up to three sentences per beat.** Overload one and the model smears it. Present tense, short
+sentences, camera written inside the action rather than in a paragraph of its own. So a prompt
+gets longer by gaining more beats and more blocks — never by packing more into one beat.
+
+### Name the role of every reference
+
+Otherwise the model decides for itself and decides wrong — it copies the composition instead of
+the face, or the face instead of the colour palette:
+
+```
+@char_… for character reference
+@loc_… for location reference — take only the space and the texture: do not use as a starting
+frame, do not inherit the composition, the angle or the colour.
+```
+
+### Three prompt rules that break generations more than anything else
+
+1. **Every tag appears exactly once, inside ACTIVE REFERENCES.** A duplicated tag at the end of a
+   prompt is named as the most common reason a generation refuses to launch.
+2. **The location reference carries an explicit ban on inheritance** — it controls geometry,
+   materials, light and atmosphere but never framing. Without that line the model hands back a
+   near-copy of the plate.
+3. **Reference budget per generation: 9 images, 3 videos, 3 audio.** That budget decides how many
+   named characters can share a shot — build the shot list around it.
+
+### Speech lives only in the audio block
+
+A dialogue line is built in four parts, always in this order: **the voice and its emotion → the
+line in quotes → the physical action → the facial reaction.** And the separation is hard:
+
+> Lines live only in the audio section of the prompt — not one word of speech inside the action.
+
+Because the model adds its own filler — "uhm", chuckles, whole invented phrases — the prompt
+carries an explicit block: everyone speaks **only** the quoted line, anyone without a line stays
+completely silent, and a half-laugh written into the action is a facial expression **with no
+sound**. Write the mix as well — voices clean and close to the microphone, ambience underneath,
+ambience dipping when someone speaks — and give rare names a phonetic transcription.
+
+Seam technique: **open every new generation with the line that closed the previous one.** The
+emotion crosses the cut along with the text.
+
+### Count everything that can duplicate
+
+SCENE CONTEXT opens with a literal header — `EXACT 3 CHARACTERS — NO DUPLICATES: …` — because the
+model adds extra people and clones furniture. Only characters whose references are in the prompt
+exist in the frame, and set dressing gets its own count lock: exactly one of a thing, never a
+second. Props duplicate in motion, so counts are written frame by frame.
+
+Anything much larger than a human needs **two** anchors at once — a written size comparison *and*
+a human figure in frame to measure against. With only one, the model quietly shrinks it back
+toward human height.
+
+### Add a GAZE / EYELINES block
+
+ONEIRIC's block order carries eyelines as their own section, before blocking:
+
+```
+SCENE CONTEXT · ACTIVE REFERENCES · LOCATION MAP · GAZE / EYELINES ·
+FIRST FRAME AND BLOCKING · SEGMENTS (timed beats) · DIALOGUE · AUDIO ·
+PHYSICS · LIGHTING · STYLE / FORMAT · POSITIVE LOCKS
+```
+
+They also split DIALOGUE from AUDIO, with AUDIO carrying voice identity only, and they repeat
+the LENS description **inside every segment** rather than once at the top — because every prompt
+is an island.
 
 ### CINEDANCE ships three reference files — open them, the head file is not enough
 
@@ -558,6 +913,10 @@ gets split at a cut, not stretched.
 
 ## Rules that carry the cost
 
+- Script stress-tested before a single generation — a weak scene generates beautifully and
+  still doesn't work.
+- Assets first: not one shot until every character, location and prop is named, versioned and
+  locked. A new state is a new asset, never an overwrite.
 - Script written in the import format, so Elements are extracted and not retyped.
 - Voice-over recorded and measured before any picture, on a VO-driven piece.
 - Scenes grouped into generations by location and cast, never by timeline position.
@@ -571,3 +930,46 @@ gets split at a cut, not stretched.
 - Check the first-frame still before generating video.
 - Test the hard fragment before the full length whenever the scene is non-trivial.
 - 480p until approved. **Upscale is optional and always last** — never to judge a take.
+- Every prompt is an island. "Same as the previous shot" is an instruction to a model that has
+  no "before" — positions, wardrobe, props, optics and light are spelled out from scratch, every
+  time, including inside each segment of a multi-shot prompt.
+- Anything the video model keeps dropping goes into the asset image instead of the prompt.
+- Staging past two characters goes in a blocking map, not in words.
+- Every scene opens with a one-second master shot; the spatial map is pasted into every prompt of
+  that scene unchanged.
+- Positions are tied to landmarks visible in the plate, never to metres.
+- **Change one thing per iteration**, and log it — version, what changed, verdict. Rewriting a
+  prompt in full loses the parts that worked, and without a log you cannot repeat a good shot or
+  tell whether you already tried a fix.
+- **After fifteen to twenty attempts, change the shot, not the sentence.** Split it in two, drop
+  an action, change the angle. This is the same conclusion we reached on the counter staging in
+  Block A, and the feature brief states it flatly: every failing shot they saved was saved by
+  changing the shot, never by rewording it.
+- **Complex action never sits in the middle of the timing** — open the prompt with it already
+  underway, and make the approach a separate shot.
+- **Write laws, not requests.** A rule becomes a law when it has a name, a visible proof in the
+  frame, and a sentence saying what counts as a broken shot — the `= failed take` idiom. Scale is
+  set by three things at once (a real measure, a fraction of the frame, a comparison to an object
+  already in shot); height by a direction to fail in; object count frame by frame, because props
+  duplicate in motion; emotion clamped from both sides, since a one-word tone arrives as
+  caricature.
+- **One clip, one speaker, one short line**, with a second of silence after it — it gives the
+  edit a seam and gives the model nothing to fill with invented sound.
+- `SFX only. No music.` in every prompt — continuous ambience laid in post is what glues
+  generated shots into one space.
+- Cut more aggressively than feels right, and trim the first and last half-second of every clip:
+  generations run slow and the edges drift.
+
+### Where a negative is allowed
+
+Higgsfield's iron rule is "say what you want, not what you avoid — the words you write are the
+words you summon, including the ones inside a 'no'". Our own results say naming a cheat is
+sometimes the only thing that works. Both hold, and the line is what to write down:
+
+| Kind of negative | Verdict |
+|---|---|
+| A renderable noun — *lens flare, grid, vector, flat illustration, letters, subtitles* | Never write it, not even as a ban. The token summons the thing. Ban it at the image stage only, if at all. |
+| A blocking or action cheat — *do not enter from a side door, do not skip his approach, do not replace the hand raise with a glance* | Works, and often nothing else does. It names a behaviour, not an object the model can draw. |
+
+And before strengthening any broken rule, look for the positive requirement that made breaking
+it unavoidable — see the "must remain visible" trap in `references/dialogue-prompt.md`.
