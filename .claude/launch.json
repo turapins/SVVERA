@@ -3,14 +3,14 @@
   "configurations": [
     {
       "name": "backlot",
-      "runtimeExecutable": "python",
+      "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "backlot", "serve", "--port", "4750"],
       "port": 4750
     },
     {
       "name": "mockups",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4788", "--bind", "127.0.0.1"],
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4788", "--bind", "127.0.0.1", "--directory", "mockups"],
       "port": 4788
     }
   ]
