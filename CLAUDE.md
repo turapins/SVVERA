@@ -46,49 +46,61 @@ Read [`context/scripts/`](context/scripts/) for winning and losing ad scripts wi
 
 ### Where skills live — and which copy to edit
 
-Skills live in four places. Editing the wrong copy wastes the edit.
+**`.agents/skills/` is not loaded by Claude Code.** That is the fact everything
+else follows from, and it is not guessable from the directory name. Measured on
+2026-09-04: 33 skills existed only there, and not one was callable — `comfyui`,
+`gsap-*`, `dashscope`, `lyria`, `seedance-2-5`, `atlas-cloud`,
+`3d-asset-generation` were all absent from the agent's skill list. Meanwhile
+every skill unique to `.claude/skills/` (`cinema-workflow`, `vo-ad-assembly`,
+`winning-ads-script-writer`, `tig-*`, `locals_*`) was available.
 
-| Location | Count | What it is |
+`.agents/` is the vendor-neutral layout for *other* harnesses — several skills
+there carry an `agents/openai.yaml` — and it arrived with the upstream
+calesthio/OpenMontage fork, which supports multiple agents.
+
+| Location | Loaded here? | Role |
 |---|---|---|
-| `.agents/skills/` | ~105 | **Mixed**: 89 mirrored from upstream calesthio/OpenMontage, 16 added by SVVERA |
-| `.claude/skills/` | ~75 | This project — **the copy Claude Code loads natively** |
-| `skills/` | 7 areas | SVVERA's own domain skills (`vocal-image`, `brand`, `creative`, `meta`, …) |
-| `~/.claude/skills/` | ~25 | Global, untracked — the HyperFrames family plus `watch` |
+| `.claude/skills/` | **Yes** | This project's skills — the only project-local ones the agent can call |
+| `~/.claude/skills/` | **Yes, in every project** | Global, untracked (HyperFrames family, `watch`) |
+| `.agents/skills/` | **No** | Reference library for other harnesses; ~105 skills, 89 mirrored from upstream + 16 SVVERA's own |
+| `skills/` | n/a | SVVERA prose docs (`vocal-image/playbook.md`, `brand/`, …), read by path, not invoked |
 
-`.agents/skills/` is not a pure mirror, so "never touch it" would be wrong. Check
-which kind a skill is before editing:
+**Consequences.**
 
-```bash
-git cat-file -e calesthio/main:.agents/skills/<name> && echo upstream || echo ours
-```
+- To make a skill usable, it must be in `.claude/skills/`. Copying it into
+  `.agents/skills/` alone changes nothing for this agent.
+- A skill kept in both is normal — that is how the whole `higgsfield-*` family
+  and the SVVERA additions are stored. `.claude/` is the live copy;
+  `.agents/` is the reference one.
+- Do not edit an **upstream-mirrored** skill in `.agents/skills/` in place; the
+  next sync overwrites it. Check which kind it is:
+  ```bash
+  git cat-file -e calesthio/main:.agents/skills/<name> && echo upstream || echo ours
+  ```
+- Leave `~/.claude/skills/` alone; tooling outside this repo refreshes it.
 
-- **Upstream-mirrored** (`threejs-*`, `gsap-*`, `manim-*`, `remotion`, `ffmpeg`, …): do not
-  edit in place. The next sync overwrites the edit or turns it into a conflict.
-  Copy from it, don't write to it.
-- **SVVERA-added** (the whole `higgsfield-*` family, `hyperframes-audio`,
-  `hyperframes-keyframes`, `watch`, `mova`, `ad-creative`,
-  `competitor-profiling`, `marketing-psychology`, `character-sheet-production`,
-  `kling-motion-control`): these are ours and are vendored into **both**
-  `.agents/skills/` and `.claude/skills/`. A new SVVERA skill follows the same
-  pattern — add it to both.
-
-62 skills exist in both tracked directories. Since the agent loads the
-`.claude/` copy, a stale copy there is an instruction it follows rather than
-questions. On 2026-09-04 two had drifted with nothing surfacing it:
-`.claude/skills/elevenlabs` was four months behind and missing the whole
-provider-routing section (no `fal_elevenlabs_tts`, and it still implied asking
-the user for a `.env` key), and `.claude/skills/ai-video-gen` was missing the
-Kling Official path.
-
-`tests/contracts/test_skill_dir_parity.py` fails on any such drift and names the
-files. To resolve one, copy the newer side over the older:
+**Drift between the two tracked copies is a real hazard**, because the agent
+loads the `.claude/` one and a stale copy there is an instruction it follows
+rather than questions. On 2026-09-04 `.claude/skills/elevenlabs` was four months
+behind and missing the whole provider-routing section — so it did not know about
+`fal_elevenlabs_tts` and still implied asking the user for a `.env` key, which
+is wrong for a shared installation. `.claude/skills/ai-video-gen` was missing the
+Kling Official path. `tests/contracts/test_skill_dir_parity.py` now fails on any
+such drift and names the files. To resolve one:
 
 ```bash
 rm -rf .claude/skills/<name> && cp -r .agents/skills/<name> .claude/skills/<name>
 ```
 
-Leave `~/.claude/skills/` alone — it is installed and refreshed by tooling
-outside this repo.
+Still parked in `.agents/skills/` only, deliberately: the `gsap-*` family (the
+HyperFrames animation skills cover this ground and do load), the 2D/3D rigging
+set (`character-rigging`, `pose-library-design`, `svg-character-animation`,
+`canvas-procedural-animation`, `character-animation-qa`, `3d-asset-generation`,
+`threejs-world-generation` — we generate video rather than rig it),
+`synthetic-screen-recording`, `video-toolkit` (superseded by the loaded
+`video_toolkit`), and the providers with no credentials in `.env`
+(`atlas-cloud`, `dashscope`, `fish-audio-tts`, `comfyui`, `kling-official`).
+Copy one across if a project ever needs it.
 
 ### Verifying Python changes
 
