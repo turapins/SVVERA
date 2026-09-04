@@ -3,10 +3,10 @@
 The 12 HyperFrames-family skills under `.agents/skills/` are vendored from the upstream HyperFrames monorepo:
 
 - **Source**: https://github.com/heygen-com/hyperframes
-- **Vendored commit**: `3351fb1a` (`chore: release v0.7.17`, 2026-06-27)
-- **Vendored tag**: `v0.7.17`
-- **Vendor date**: 2026-06-27
-- **Vendored by**: re-vendor on branch `chore/version-bumps-and-hf-resync`
+- **Vendored commit**: `19ab83f` (`chore: release v0.8.27 (#3608)`, 2026-09-03)
+- **Vendored tag**: `v0.8.27`
+- **Vendor date**: 2026-09-04
+- **Vendored by**: re-vendor on branch `turapins/update-toolchain-2026-09-04`
 
 ## What's vendored
 
@@ -40,23 +40,41 @@ These upstream skills are HF-workflow-specific and would compete with or duplica
 
 ## Re-sync instructions
 
-To re-vendor from a newer upstream:
+The previous version of this section pointed at the upstream author's own Windows
+checkout (`C:/Users/ishan/...`) and could not be run anywhere else. Machine-independent:
 
 ```bash
-cd C:/Users/ishan/Documents/hyperframes
-git pull --ff-only origin main
-# Then in OpenMontage:
-cd /c/Users/ishan/Documents/OpenMontage
-HF=C:/Users/ishan/Documents/hyperframes
+UP=$(mktemp -d)
+git clone --depth 50 --branch <tag> https://github.com/heygen-com/hyperframes.git "$UP"
+cd /path/to/OpenMontage
 for d in hyperframes hyperframes-cli hyperframes-registry hyperframes-core \
-         hyperframes-creative hyperframes-media hyperframes-animation \
-         media-use motion-graphics remotion-to-hyperframes \
-         music-to-video website-to-video; do
-  rm -rf ".agents/skills/$d"
-  cp -r "$HF/skills/$d" ".agents/skills/$d"
+         hyperframes-creative hyperframes-animation hyperframes-audio \
+         hyperframes-keyframes media-use motion-graphics \
+         remotion-to-hyperframes music-to-video; do
+  rm -rf ".agents/skills/$d"; cp -r "$UP/skills/$d" ".agents/skills/$d"
 done
-# Then update vendor commit/tag/date at the top of this file.
+git checkout HEAD -- .agents/skills/hyperframes/PROVENANCE.md   # this file is OURS
+# Then update vendor commit/tag/date at the top.
 ```
+
+**Two traps.**
+
+1. `rm -rf .agents/skills/hyperframes` deletes THIS file — upstream has no
+   PROVENANCE.md, so the copy does not restore it. Hence the `git checkout` line.
+2. **Check the upstream skill list before copying.** The set is not stable across
+   minor versions, and a stale loop fails silently on renamed directories:
+
+| Version | Change |
+|---|---|
+| 0.4 → 0.7 | `hyperframes` split into `-core` / `-animation` / `-creative` / `-media`; `website-to-hyperframes` → `website-to-video` |
+| 0.7 → 0.8 | `hyperframes-media` → **`hyperframes-audio`** (rename); **`hyperframes-keyframes`** added; `website-to-video` **removed upstream**; `figma` added; `hyperframes-animation/examples/assets/` (37 MB of binaries) dropped |
+
+`website-to-video` is kept here as an orphaned 0.7.17 vendor — it no longer exists
+upstream and will never refresh again. Drop it or replace it with a local skill
+when the pipeline next touches that path.
+
+`figma` is deliberately not vendored: the Figma MCP plugin installed here covers
+the same ground.
 
 ## Future automation
 
